@@ -33,6 +33,7 @@ import Inventory from '../../pages/Inventory';
 import Notifications from '../../pages/Notifications';
 import AIInsights from '../../pages/AIInsights';
 import Reports from '../../pages/Reports';
+import Settings from '../../pages/Settings';
 
 const drawerWidth = 240;
 
@@ -132,6 +133,7 @@ const AppLayout = () => {
                     <Route path="notifications" element={<Notifications />} />
                     <Route path="ai-insights" element={<AIInsights />} />
                     <Route path="reports" element={<Reports />} />
+                    <Route path="settings" element={<Settings />} />
                     <Route path="*" element={<Dashboard />} />
                 </Routes>
             </Box>

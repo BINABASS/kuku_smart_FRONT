@@ -14,14 +14,69 @@ const mockUsers = {
         password: 'admin123',
         role: 'admin',
         name: 'Farm Administrator',
-        farmName: 'Smart Poultry Farm'
+        subscription: 'premium',
+        permissions: {
+            canViewAllFarms: true,
+            canManageAllFarms: true,
+            canManageFarmers: true,
+            canManageDevices: true,
+            canManageBatches: true,
+            canManageBreeds: true,
+            canManageInventory: true,
+            canManageReports: true,
+            canManageFinancials: true,
+            canManageSettings: true,
+            canCreateFarmerAccount: true,
+            canManageFarmerAccounts: true
+        }
     },
     'manager@poultryfarm.com': {
         email: 'manager@poultryfarm.com',
         password: 'manager123',
         role: 'manager',
         name: 'Farm Manager',
-        farmName: 'Smart Poultry Farm'
+        farmName: 'Green Pastures',
+        farmLocation: 'Rural Area',
+        farmSize: '100 acres',
+        subscription: 'premium',
+        permissions: {
+            canViewAllFarms: false,
+            canManageAllFarms: false,
+            canManageOwnFarm: true,
+            managedFarm: 'Green Pastures',
+            canManageDevices: true,
+            canManageBatches: true,
+            canManageBreeds: true,
+            canManageInventory: true,
+            canManageReports: true,
+            canManageFinancials: true,
+            canManageSettings: false,
+            canCreateFarmerAccount: false,
+            canManageFarmerAccounts: false
+        }
+    },
+    'farmer1@poultryfarm.com': {
+        email: 'farmer1@poultryfarm.com',
+        password: 'farmer123',
+        role: 'farmer',
+        name: 'John Smith',
+        farmName: 'Smith Farms',
+        farmLocation: 'Western Region',
+        farmSize: '50 acres',
+        subscription: 'basic',
+        permissions: {
+            canViewAllFarms: false,
+            canManageAllFarms: false,
+            canManageOwnFarm: true,
+            managedFarm: 'Smith Farms',
+            canManageDevices: true,
+            canManageBatches: true,
+            canManageBreeds: true,
+            canManageInventory: true,
+            canManageReports: true,
+            canManageFinancials: true,
+            canManageSettings: false
+        }
     }
 };
 
@@ -106,6 +161,11 @@ export const register = createAsyncThunk(
                         errorMessage = 'Farm name and department are required for manager registration';
                     }
                     break;
+                case 'farmer':
+                    if (!userData.farmName || !userData.farmSize) {
+                        errorMessage = 'Farm name and farm size are required for farmer registration';
+                    }
+                    break;
                 default:
                     throw new Error('Invalid role');
             }
@@ -121,7 +181,8 @@ export const register = createAsyncThunk(
                 ...userData,
                 token,
                 id: Date.now(), // Simulated ID
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                subscription: 'basic' // Default subscription for new users
             };
         } catch (error) {
             return rejectWithValue(error.message);

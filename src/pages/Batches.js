@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Grid } from '@mui/material';
+import { useSelector } from 'react-redux';
 import BatchList from '../components/batches/BatchList';
 import BatchForm from '../components/batches/BatchForm';
 
@@ -34,10 +35,16 @@ const sampleBatches = [
 ];
 
 const BatchesPage = () => {
+  const user = useSelector(state => state.auth.user);
   const [batches, setBatches] = useState(sampleBatches);
   const [openForm, setOpenForm] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [usingSampleData] = useState(true); // Always demo mode for now
+
+  // Filter batches by user's managed farm
+  const filteredBatches = user?.role === 'manager' && user?.permissions?.managedFarm
+    ? batches.filter(batch => batch.farm_name === user.permissions.managedFarm)
+    : batches;
 
   const handleOpenForm = (batch = null) => {
     setSelectedBatch(batch);
@@ -87,7 +94,7 @@ const BatchesPage = () => {
         </Grid>
         <Grid item xs={12}>
           <BatchList
-            batches={batches}
+            batches={filteredBatches}
             onEdit={handleOpenForm}
             onDelete={handleDelete}
             useSample={usingSampleData}

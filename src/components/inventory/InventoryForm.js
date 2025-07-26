@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -26,6 +26,32 @@ const InventoryForm = ({ open, onClose, onSubmit, item }) => {
     expiration: item?.expiration || '',
     notes: item?.notes || ''
   });
+  
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/inventory/types');
+      const selectedType = response.data.find(type => type.id === formData.type);
+      const typeCategories = selectedType?.categories || [];
+      setCategories(typeCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [formData.type]);
+
+  useEffect(() => {
+    if (formData.type) {
+      fetchCategories();
+    } else {
+      setCategories([]);
+    }
+  }, [formData.type, fetchCategories]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,15 +96,13 @@ const InventoryForm = ({ open, onClose, onSubmit, item }) => {
               onChange={handleChange}
               label="Category"
               required
+              disabled={loading}
             >
-              {api.get('/inventory/types').then(response => {
-                const categories = response.data.find(type => type.id === formData.type)?.categories || [];
-                return categories.map(category => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ));
-              })}
+              {categories.map(category => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
 

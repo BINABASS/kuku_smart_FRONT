@@ -23,8 +23,11 @@ import {
     Receipt as ReceiptIcon,
     Business as BusinessIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+    
     // Mock data for development
     const stats = {
         totalBatches: 15,
@@ -50,6 +53,25 @@ const Dashboard = () => {
         ],
         feedAlerts: 1,
         waterAlerts: 0,
+    };
+
+    const handleQuickAction = (action) => {
+        switch (action) {
+            case 'addBatch':
+                navigate('/dashboard/batches');
+                break;
+            case 'registerFarmer':
+                navigate('/dashboard/farmers');
+                break;
+            case 'addBreed':
+                navigate('/dashboard/breeds');
+                break;
+            case 'systemSettings':
+                navigate('/dashboard/settings');
+                break;
+            default:
+                break;
+        }
     };
 
     return (
@@ -241,6 +263,7 @@ const Dashboard = () => {
                                         variant="contained"
                                         fullWidth
                                         startIcon={<PetsIcon />}
+                                        onClick={() => handleQuickAction('addBatch')}
                                         sx={{ mb: 2 }}
                                     >
                                         Add New Batch
@@ -251,6 +274,7 @@ const Dashboard = () => {
                                         variant="contained"
                                         fullWidth
                                         startIcon={<PeopleIcon />}
+                                        onClick={() => handleQuickAction('registerFarmer')}
                                         sx={{ mb: 2 }}
                                     >
                                         Register Farmer
@@ -261,6 +285,7 @@ const Dashboard = () => {
                                         variant="contained"
                                         fullWidth
                                         startIcon={<BusinessIcon />}
+                                        onClick={() => handleQuickAction('addBreed')}
                                         sx={{ mb: 2 }}
                                     >
                                         Add New Breed
@@ -271,6 +296,7 @@ const Dashboard = () => {
                                         variant="contained"
                                         fullWidth
                                         startIcon={<SettingsIcon />}
+                                        onClick={() => handleQuickAction('systemSettings')}
                                         sx={{ mb: 2 }}
                                     >
                                         System Settings
