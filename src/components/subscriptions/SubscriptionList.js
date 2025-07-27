@@ -72,7 +72,7 @@ const SubscriptionList = ({ onEdit }) => {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Farmer</TableCell>
+                                                            <TableCell>Manager</TableCell>
                             <TableCell>Plan</TableCell>
                             <TableCell>Start Date</TableCell>
                             <TableCell>End Date</TableCell>
@@ -83,7 +83,7 @@ const SubscriptionList = ({ onEdit }) => {
                     <TableBody>
                         {subscriptions.map((subscription) => (
                             <TableRow key={subscription.id}>
-                                <TableCell>{subscription.farmerName}</TableCell>
+                                <TableCell>{subscription.managerName}</TableCell>
                                 <TableCell>{subscription.plan}</TableCell>
                                 <TableCell>{subscription.startDate}</TableCell>
                                 <TableCell>{subscription.endDate}</TableCell>

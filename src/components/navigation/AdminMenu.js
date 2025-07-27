@@ -28,7 +28,7 @@ const AdminMenu = ({ onNavigate }) => {
             icon: <PeopleIcon />,
             path: '/admin/users',
             subItems: [
-                { text: 'Farmers', path: '/admin/farmers' },
+                { text: 'Managers', path: '/admin/managers' },
                 { text: 'Managers', path: '/admin/managers' }
             ]
         },

@@ -35,7 +35,7 @@ const Dashboard = () => {
         revenue: 25000,
         expenses: 18000,
         profit: 7000,
-        recentFarmers: [
+        recentManagers: [
             { name: 'John Doe', email: 'john@example.com' },
             { name: 'Jane Smith', email: 'jane@example.com' },
             { name: 'Mike Johnson', email: 'mike@example.com' },
@@ -60,8 +60,8 @@ const Dashboard = () => {
             case 'addBatch':
                 navigate('/dashboard/batches');
                 break;
-            case 'registerFarmer':
-                navigate('/dashboard/farmers');
+            case 'registerManager':
+                navigate('/dashboard/managers');
                 break;
             case 'addBreed':
                 navigate('/dashboard/breeds');
@@ -274,10 +274,10 @@ const Dashboard = () => {
                                         variant="contained"
                                         fullWidth
                                         startIcon={<PeopleIcon />}
-                                        onClick={() => handleQuickAction('registerFarmer')}
+                                        onClick={() => handleQuickAction('registerManager')}
                                         sx={{ mb: 2 }}
                                     >
-                                        Register Farmer
+                                        Register Manager
                                     </Button>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>

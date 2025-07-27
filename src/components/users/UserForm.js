@@ -24,7 +24,7 @@ const UserForm = ({ open, onClose, user, roles, onSubmit, onDelete }) => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    role: user?.role || 'farmer',
+                    role: user?.role || 'manager',
     status: user?.status || 'active'
   });
 

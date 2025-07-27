@@ -33,7 +33,7 @@ const SubscriptionsPage = () => {
                                     label="Search subscriptions"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Search by farmer name or plan"
+                                    placeholder="Search by manager name or plan"
                                 />
                             </Grid>
                             <Grid item xs={12} md={4}>

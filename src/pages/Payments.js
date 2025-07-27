@@ -33,7 +33,7 @@ const PaymentsPage = () => {
                                     label="Search payments"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Search by farmer name or subscription"
+                                    placeholder="Search by manager name or subscription"
                                 />
                             </Grid>
                             <Grid item xs={12} md={4}>

@@ -38,7 +38,7 @@ const UserList = ({ users, roles, onEdit, onDelete, onCreate }) => {
   const [newUser, setNewUser] = React.useState({
     name: '',
     email: '',
-    role: 'farmer'
+                role: 'manager'
   });
 
   const handleCreateOpen = () => {
@@ -47,7 +47,7 @@ const UserList = ({ users, roles, onEdit, onDelete, onCreate }) => {
 
   const handleCreateClose = () => {
     setOpen(false);
-    setNewUser({ name: '', email: '', role: 'farmer' });
+            setNewUser({ name: '', email: '', role: 'manager' });
   };
 
   const handleCreateSubmit = () => {

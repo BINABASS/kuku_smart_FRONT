@@ -12,42 +12,23 @@ export const useRoleGuard = (requiredRole, requiredSubscription = null, farmName
     const rolePermissions = {
         'admin': {
             canManageAll: true,
-            canManageFarmers: true,
             canManageDevices: true,
             canManageBatches: true,
             canManageBreeds: true,
             canManageInventory: true,
             canManageReports: true,
             canManageFinancials: true,
-            canManageSettings: true,
-            canCreateFarmerAccount: true,
-            canManageFarmerAccounts: true
+            canManageSettings: true
         },
         'manager': {
             canManageAll: false,
-            canManageFarmers: false,
             canManageDevices: true,
             canManageBatches: true,
             canManageBreeds: true,
             canManageInventory: true,
             canManageReports: true,
             canManageFinancials: true,
-            canManageSettings: false,
-            canCreateFarmerAccount: false,
-            canManageFarmerAccounts: false
-        },
-        'farmer': {
-            canManageAll: false,
-            canManageFarmers: false,
-            canManageDevices: true,
-            canManageBatches: true,
-            canManageBreeds: true,
-            canManageInventory: true,
-            canManageReports: true,
-            canManageFinancials: true,
-            canManageSettings: false,
-            canCreateFarmerAccount: false,
-            canManageFarmerAccounts: false
+            canManageSettings: false
         }
     };
 
@@ -68,8 +49,8 @@ export const useRoleGuard = (requiredRole, requiredSubscription = null, farmName
             return true;
         }
         
-        // Manager and farmer can only access their own farm
-        if (user.role === 'manager' || user.role === 'farmer') {
+        // Manager can only access their own farm
+        if (user.role === 'manager') {
             return user.permissions?.managedFarm === farmName;
         }
     }
@@ -111,11 +92,6 @@ export const useAdminGuard = () => {
 export const useManagerGuard = () => {
     const user = useSelector(state => state.auth.user);
     return user && (user.role === 'admin' || user.role === 'manager');
-};
-
-export const useFarmerGuard = () => {
-    const user = useSelector(state => state.auth.user);
-    return user && (user.role === 'admin' || user.role === 'manager' || user.role === 'farmer');
 };
 
 // Export helper functions for subscription levels

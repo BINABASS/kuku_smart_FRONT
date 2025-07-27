@@ -38,7 +38,7 @@ const mockSensors = [
 const mockSubscriptions = [
   {
     id: 'sub1',
-    farmerName: 'John Smith',
+    managerName: 'John Smith',
     farmName: 'Smith Poultry Farm',
     plan: 'Premium',
     startDate: '2024-01-15',
@@ -62,7 +62,7 @@ const mockSubscriptions = [
   },
   {
     id: 'sub2',
-    farmerName: 'Sarah Johnson',
+    managerName: 'Sarah Johnson',
     farmName: 'Johnson Family Farm',
     plan: 'Standard',
     startDate: '2024-02-01',
@@ -85,7 +85,7 @@ const mockSubscriptions = [
   },
   {
     id: 'sub3',
-    farmerName: 'Michael Brown',
+    managerName: 'Michael Brown',
     farmName: 'Brown Poultry',
     plan: 'Enterprise',
     startDate: '2024-03-01',
@@ -109,7 +109,7 @@ const mockSubscriptions = [
   },
   {
     id: 'sub4',
-    farmerName: 'Emily Wilson',
+    managerName: 'Emily Wilson',
     farmName: 'Wilson Farms',
     plan: 'Basic',
     startDate: '2024-04-01',
@@ -132,7 +132,7 @@ const mockSubscriptions = [
   },
   {
     id: 'sub5',
-    farmerName: 'Robert Davis',
+    managerName: 'Robert Davis',
     farmName: 'Davis Poultry',
     plan: 'Premium',
     startDate: '2024-05-01',
@@ -160,8 +160,7 @@ const mockSubscriptions = [
 // Mock user roles
 const userRoles = [
   { id: 'admin', name: 'Administrator', permissions: ['all'] },
-  { id: 'manager', name: 'Manager', permissions: ['users', 'subscriptions', 'analytics'] },
-  { id: 'farmer', name: 'Farmer', permissions: ['farms', 'sensors', 'activities'] }
+  { id: 'manager', name: 'Manager', permissions: ['users', 'subscriptions', 'analytics'] }
 ];
 
 // Mock user data
@@ -197,38 +196,6 @@ const mockUsers = [
     planEndDate: '2025-02-01',
     paymentStatus: 'pending',
     permissions: ['users', 'subscriptions', 'analytics']
-  },
-  {
-    id: 'user3',
-    name: 'Michael Brown',
-    email: 'michael.brown@example.com',
-    role: 'farmer',
-    status: 'active',
-    lastLogin: '2024-07-23T15:45:00+03:00',
-    farms: ['farm4'],
-    devices: 20,
-    sensors: 40,
-    subscription: 'Enterprise',
-    planStartDate: '2024-03-01',
-    planEndDate: '2026-03-01',
-    paymentStatus: 'paid',
-    permissions: ['farms', 'sensors', 'activities']
-  },
-  {
-    id: 'user4',
-    name: 'Emily Wilson',
-    email: 'emily.wilson@example.com',
-    role: 'farmer',
-    status: 'inactive',
-    lastLogin: '2024-04-01T10:00:00+03:00',
-    farms: ['farm5'],
-    devices: 2,
-    sensors: 5,
-    subscription: 'Basic',
-    planStartDate: '2024-04-01',
-    planEndDate: '2025-04-01',
-    paymentStatus: 'paid',
-    permissions: ['farms', 'sensors', 'activities']
   }
 ];
 
