@@ -25,19 +25,19 @@ const Welcome = () => {
             title: 'Smart Farm Management',
             description: 'Efficiently manage your poultry farm with real-time monitoring and analytics',
             icon: <ProductionQuantityLimits sx={{ fontSize: 40 }} />,
-            image: 'https://via.placeholder.com/400x300/007bff/ffffff?text=Farm+Management'
+            image: null
         },
         {
             title: 'Data Analytics',
             description: 'Get insights into your farm\'s performance with comprehensive analytics',
             icon: <Analytics sx={{ fontSize: 40 }} />,
-            image: 'https://via.placeholder.com/400x300/28a745/ffffff?text=Data+Analytics'
+            image: null
         },
         {
             title: 'User Management',
             description: 'Manage multiple users with different access levels',
             icon: <Settings sx={{ fontSize: 40 }} />,
-            image: 'https://via.placeholder.com/400x300/17a2b8/ffffff?text=User+Management'
+            image: null
         }
     ];
 

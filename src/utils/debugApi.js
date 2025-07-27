@@ -2,20 +2,26 @@
 // Run this in browser console
 
 const debugApi = {
-  // Test login
+  // Test login with detailed logging
   testLogin: async (email = 'admin@poultryfarm.com', password = 'admin123') => {
     console.log('🧪 Testing login...');
+    console.log('Request URL:', 'http://localhost:8000/api/auth/login/');
+    console.log('Request payload:', { email, password });
+    
     try {
       const response = await fetch('http://localhost:8000/api/auth/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({ email, password })
       });
       
       console.log('Response status:', response.status);
+      console.log('Response status text:', response.statusText);
       console.log('Response headers:', response.headers);
+      console.log('Response URL:', response.url);
       
       const data = await response.json();
       console.log('Response data:', data);
@@ -29,6 +35,29 @@ const debugApi = {
       }
     } catch (error) {
       console.error('❌ Network error:', error);
+      return null;
+    }
+  },
+
+  // Test login using axios (same as frontend)
+  testLoginAxios: async (email = 'admin@poultryfarm.com', password = 'admin123') => {
+    console.log('🧪 Testing login with axios...');
+    
+    try {
+      const axios = await import('axios');
+      const response = await axios.default.post('http://localhost:8000/api/auth/login/', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      console.log('Axios response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Axios error:', error.response || error);
       return null;
     }
   },
@@ -88,6 +117,25 @@ const debugApi = {
     }
   },
 
+  // Test the actual frontend API instance
+  testFrontendApi: async () => {
+    console.log('🧪 Testing frontend API instance...');
+    try {
+      // Import the actual API instance used by the frontend
+      const api = await import('./api.js');
+      const response = await api.default.post('/auth/login/', {
+        email: 'admin@poultryfarm.com',
+        password: 'admin123'
+      });
+      
+      console.log('Frontend API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Frontend API error:', error.response || error);
+      return null;
+    }
+  },
+
   // Run all tests
   runAllTests: async () => {
     console.log('🚀 Running all API tests...');
@@ -95,15 +143,26 @@ const debugApi = {
     // Test CORS first
     await debugApi.testCORS();
     
-    // Test login
-    const loginResult = await debugApi.testLogin();
+    // Test fetch login
+    const fetchResult = await debugApi.testLogin();
     
-    if (loginResult && loginResult.token) {
+    // Test axios login
+    const axiosResult = await debugApi.testLoginAxios();
+    
+    // Test frontend API
+    const frontendResult = await debugApi.testFrontendApi();
+    
+    if (fetchResult && fetchResult.token) {
       // Test devices API with token
-      await debugApi.testDevices(loginResult.token);
+      await debugApi.testDevices(fetchResult.token);
     }
     
     console.log('🏁 All tests completed!');
+    console.log('Results:', {
+      fetch: fetchResult ? 'SUCCESS' : 'FAILED',
+      axios: axiosResult ? 'SUCCESS' : 'FAILED',
+      frontend: frontendResult ? 'SUCCESS' : 'FAILED'
+    });
   }
 };
 

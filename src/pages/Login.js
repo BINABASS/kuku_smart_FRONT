@@ -42,16 +42,24 @@ export default function Login() {
         e.preventDefault();
         try {
             setLoading(true);
+            setError('');
+            console.log('Attempting login with:', formData);
+            
             const result = await dispatch(login(formData));
+            console.log('Login result:', result);
+            
             if (login.fulfilled.match(result)) {
-                dispatch({
-                    type: 'auth/setUser',
-                    payload: result.payload
-                });
+                console.log('Login successful, navigating to dashboard');
+                // Login successful - navigate to dashboard
                 navigate('/dashboard');
+            } else if (login.rejected.match(result)) {
+                console.log('Login failed:', result.payload);
+                // Login failed - show error
+                setError(result.payload || 'Login failed');
             }
         } catch (err) {
-            setError(err.message);
+            console.error('Login error:', err);
+            setError(err.message || 'Login failed');
         } finally {
             setLoading(false);
         }
