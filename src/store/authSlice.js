@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../utils/api'; // Added missing import
+import api from '../utils/api';
 
 const initialState = {
     user: null,
@@ -7,8 +7,6 @@ const initialState = {
     loading: false,
     error: null
 };
-
-// Note: Authentication now uses real API calls instead of mock data
 
 const authSlice = createSlice({
     name: 'auth',
@@ -18,6 +16,7 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.user = null;
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
         },
         setUser: (state, action) => {
             state.user = action.payload;
@@ -25,6 +24,9 @@ const authSlice = createSlice({
         },
         setError: (state, action) => {
             state.error = action.payload;
+        },
+        clearError: (state) => {
+            state.error = null;
         }
     },
     extraReducers: (builder) => {
@@ -35,18 +37,34 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
+                state.user = action.payload.user;
                 state.isAuthenticated = true;
                 localStorage.setItem('token', action.payload.token);
+                localStorage.setItem('user', JSON.stringify(action.payload.user));
             })
             .addCase(login.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(register.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(register.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user;
+                state.isAuthenticated = true;
+                localStorage.setItem('token', action.payload.token);
+                localStorage.setItem('user', JSON.stringify(action.payload.user));
+            })
+            .addCase(register.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
     }
 });
 
-export const { logout, setUser, setError } = authSlice.actions;
+export const { logout, setUser, setError, clearError } = authSlice.actions;
 
 // Async thunk for login
 export const login = createAsyncThunk(
@@ -56,7 +74,7 @@ export const login = createAsyncThunk(
             const response = await api.post('/auth/login/', credentials);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Login failed');
+            return rejectWithValue(error.response?.data?.error || 'Login failed');
         }
     }
 );
@@ -65,34 +83,10 @@ export const register = createAsyncThunk(
     'auth/register',
     async (userData, { rejectWithValue }) => {
         try {
-            // Validate role-specific requirements
-            const role = userData.role;
-            let errorMessage;
-            
-            switch (role) {
-                case 'admin':
-                    if (!userData.farmName || !userData.position) {
-                        errorMessage = 'Farm name and position are required for admin registration';
-                    }
-                    break;
-                case 'manager':
-                    if (!userData.farmName || !userData.department) {
-                        errorMessage = 'Farm name and department are required for manager registration';
-                    }
-                    break;
-                default:
-                    throw new Error('Invalid role');
-            }
-
-            if (errorMessage) {
-                throw new Error(errorMessage);
-            }
-
-            // In production, this would be an API call to register the user
             const response = await api.post('/auth/register/', userData);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Registration failed');
+            return rejectWithValue(error.response?.data?.error || 'Registration failed');
         }
     }
 );

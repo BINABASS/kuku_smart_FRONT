@@ -16,6 +16,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Welcome from './pages/Welcome';
 import Payments from './pages/Payments';
+import TestIntegration from './components/TestIntegration';
+
+// Debug script
+import './utils/debugApi';
 
 const theme = createTheme({
     palette: {
@@ -42,6 +46,7 @@ function App() {
                             <Route path="/" element={<Welcome />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
+                            <Route path="/test" element={<TestIntegration />} />
 
                             {/* Protected routes */}
                             <Route path="/dashboard/*" element={
