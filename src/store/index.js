@@ -9,7 +9,7 @@ const persistConfig = {
   key: 'root',
   storage,
   whitelist: ['auth'],
-  timeout: 5000,
+  // Remove timeout to prevent issues
 };
 
 const rootReducer = combineReducers({
@@ -28,4 +28,5 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
+  devTools: process.env.NODE_ENV !== 'production',
 });

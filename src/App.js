@@ -4,8 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { PersistGate } from 'redux-persist/integration/react';
-import { persistStore } from 'redux-persist';
+import { Box, Typography } from '@mui/material';
 
 // Layout and Pages
 import AppLayout from './components/layout/AppLayout';
@@ -32,38 +31,79 @@ const theme = createTheme({
     },
 });
 
-function App() {
-    const persistor = persistStore(store);
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
 
+    static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('App Error:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <Box sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="h4" color="error" gutterBottom>
+                        Something went wrong!
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                        {this.state.error?.message || 'An unexpected error occurred'}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 2 }}>
+                        Please check the console for more details.
+                    </Typography>
+                </Box>
+            );
+        }
+
+        return this.props.children;
+    }
+}
+
+// Main App Content
+function AppContent() {
     return (
-        <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <ThemeProvider theme={theme}>
-                    <div>
-                        <CssBaseline />
-                        <Routes>
-                            {/* Public routes */}
-                            <Route path="/" element={<Welcome />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            <Route path="/test" element={<TestIntegration />} />
+        <ThemeProvider theme={theme}>
+            <div>
+                <CssBaseline />
+                <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Welcome />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/test" element={<TestIntegration />} />
 
-                            {/* Protected routes */}
-                            <Route path="/dashboard/*" element={
-                                <ProtectedRoute allowedRoles={['admin', 'manager']}>
-                                    <AppLayout />
-                                </ProtectedRoute>
-                            } />
-                            <Route path="/payments" element={
-                                <ProtectedRoute allowedRoles={['admin', 'manager']}>
-                                    <Payments />
-                                </ProtectedRoute>
-                            } />
-                        </Routes>
-                    </div>
-                </ThemeProvider>
-            </PersistGate>
-        </Provider>
+                    {/* Protected routes */}
+                    <Route path="/dashboard/*" element={
+                        <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                            <AppLayout />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/payments" element={
+                        <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                            <Payments />
+                        </ProtectedRoute>
+                    } />
+                </Routes>
+            </div>
+        </ThemeProvider>
+    );
+}
+
+function App() {
+    return (
+        <ErrorBoundary>
+            <Provider store={store}>
+                <AppContent />
+            </Provider>
+        </ErrorBoundary>
     );
 }
 

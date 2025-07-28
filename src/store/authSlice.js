@@ -13,6 +13,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
+            console.log('Logout called - clearing user state');
             state.isAuthenticated = false;
             state.user = null;
             localStorage.removeItem('token');
@@ -34,6 +35,7 @@ const authSlice = createSlice({
             .addCase(login.pending, (state) => {
                 state.loading = true;
                 state.error = null;
+                console.log('Login pending...');
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
@@ -41,10 +43,12 @@ const authSlice = createSlice({
                 state.isAuthenticated = true;
                 localStorage.setItem('token', action.payload.token);
                 localStorage.setItem('user', JSON.stringify(action.payload.user));
+                console.log('Login fulfilled - user set:', action.payload.user);
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+                console.log('Login rejected:', action.payload);
             })
             .addCase(register.pending, (state) => {
                 state.loading = true;
