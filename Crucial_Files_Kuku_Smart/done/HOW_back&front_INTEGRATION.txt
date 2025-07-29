@@ -1,0 +1,116 @@
+Great question! Let me show you the key files I used for integrating the backend and frontend. Here are the main integration files:
+
+Search files...
+Based on my analysis, here are the **key files I used for integrating the backend and frontend**:
+
+## �� **Frontend-Backend Integration Files**
+
+### **1. Core API Configuration Files**
+
+**`frontend/src/utils/api.js`** - Main API client
+- Centralized Axios instance with base URL `http://localhost:8000/api`
+- Request/response interceptors for authentication
+- Token management (`Token ${token}` format for Django)
+- Automatic logout on 401 errors
+
+**`frontend/src/services/apiService.js`** - Service layer
+- Organized API calls by module (auth, devices, sensors, etc.)
+- Clean separation of concerns
+- Reusable service functions
+
+### **2. Authentication Integration**
+
+**`frontend/src/store/authSlice.js`** - Redux authentication state
+- Real API calls instead of mock data
+- Token storage in localStorage
+- User state management with role-based permissions
+
+**`backend/users/auth_views.py`** - Django authentication endpoints
+- Custom login/register views with role-based responses
+- CSRF exemption for API calls
+- Token authentication with user permissions
+
+### **3. Backend Configuration**
+
+**`backend/kuku_smart/settings.py`** - Django settings
+- CORS configuration for frontend access
+- REST Framework settings with TokenAuthentication
+- Database and middleware configuration
+
+**`backend/kuku_smart/urls.py`** - API routing
+- All API endpoints under `/api/` prefix
+- Includes all app URLs (users, devices, sensors, etc.)
+
+### **4. Redux Store Integration**
+
+**`frontend/src/store/index.js`** - Redux store configuration
+- Redux Persist for state persistence
+- Combined reducers for all modules
+
+**`frontend/src/store/devicesSlice.js`** - Example Redux slice
+- Async thunks for API calls
+- Error handling with rejectWithValue
+- Service-based API calls
+
+### **5. Component Integration Examples**
+
+**`frontend/src/pages/Login.js`** - Authentication UI
+- Real API calls to backend
+- Redux state management
+- Navigation after successful login
+
+**`frontend/src/components/auth/ProtectedRoute.js`** - Route protection
+- Role-based access control
+- Redux state checking
+- Automatic redirects
+
+### **6. Testing & Debugging Files**
+
+**`frontend/src/utils/debugApi.js`** - Debug utilities
+- API testing functions
+- CORS testing
+- Frontend-backend connection verification
+
+**`frontend/src/components/TestIntegration.js`** - Manual testing UI
+- Interactive API testing
+- Login testing for both users
+- Device API testing
+
+### **7. Backend API Endpoints**
+
+**`backend/devices/views.py`** - Example ViewSet
+- ModelViewSet for CRUD operations
+- Token authentication
+- JSON responses
+
+**`backend/devices/serializers.py`** - Data serialization
+- ModelSerializer for API responses
+- Field mapping for frontend compatibility
+
+### **8. Database & Data Setup**
+
+**`backend/users/management/commands/setup_test_data.py`** - Test data
+- Creates test users (admin, manager)
+- Populates all models with sample data
+- Ready-to-use credentials
+
+## 🔧 **Key Integration Features**
+
+1. **Authentication Flow**: Frontend → Django Token Auth → Redux State
+2. **CORS Configuration**: Allows frontend (localhost:3000) to access backend (localhost:8000)
+3. **API Standardization**: All endpoints under `/api/` with consistent response format
+4. **Error Handling**: Automatic logout on 401, error messages in UI
+5. **State Persistence**: Redux Persist maintains user session
+6. **Role-Based Access**: Different permissions for admin vs manager
+
+## 📋 **Integration Checklist**
+
+✅ **Frontend API Client** (`api.js`)
+✅ **Authentication System** (`authSlice.js` + `auth_views.py`)
+✅ **CORS Configuration** (`settings.py`)
+✅ **API Endpoints** (all Django apps)
+✅ **Redux Integration** (all slices)
+✅ **Error Handling** (interceptors + UI)
+✅ **Testing Tools** (`debugApi.js` + `TestIntegration.js`)
+
+These files work together to create a seamless frontend-backend integration with proper authentication, error handling, and state management! 🚀

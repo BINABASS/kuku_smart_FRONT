@@ -1,5 +1,5 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './authSlice';
 import devicesReducer from './devicesSlice';
@@ -30,3 +30,5 @@ export const store = configureStore({
     }),
   devTools: process.env.NODE_ENV !== 'production',
 });
+
+export const persistor = persistStore(store);

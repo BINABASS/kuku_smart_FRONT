@@ -2,9 +2,12 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Provider } from 'react-redux';
-import { store } from './store';
+import { Provider, useDispatch } from 'react-redux';
+import { store, persistor } from './store';
 import { Box, Typography } from '@mui/material';
+import { PersistGate } from 'redux-persist/integration/react';
+import { setUser, setToken } from './store/authSlice';
+import { useEffect } from 'react';
 
 // Layout and Pages
 import AppLayout from './components/layout/AppLayout';
@@ -15,6 +18,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Welcome from './pages/Welcome';
 import Payments from './pages/Payments';
+import UserProfile from './pages/UserProfile';
 import TestIntegration from './components/TestIntegration';
 
 // Debug script - only load in development
@@ -88,6 +92,11 @@ function AppContent() {
                             <AppLayout />
                         </ProtectedRoute>
                     } />
+                    <Route path="/profile" element={
+                        <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                            <UserProfile />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/payments" element={
                         <ProtectedRoute allowedRoles={['admin', 'manager']}>
                             <Payments />
@@ -100,10 +109,21 @@ function AppContent() {
 }
 
 function App() {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        if (user && token) {
+            dispatch(setUser(JSON.parse(user)));
+            dispatch(setToken(token));
+        }
+    }, [dispatch]);
     return (
         <ErrorBoundary>
             <Provider store={store}>
+                <PersistGate loading={null} persistor={persistor}>
                 <AppContent />
+                </PersistGate>
             </Provider>
         </ErrorBoundary>
     );

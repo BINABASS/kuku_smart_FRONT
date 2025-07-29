@@ -37,7 +37,7 @@ api.interceptors.response.use(
       // Note: In a real app, you might want to use a custom event or context
       // to trigger navigation from components instead of directly here
       if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      window.location.href = '/login';
       }
     }
     return Promise.reject(error);

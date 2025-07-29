@@ -33,6 +33,7 @@ import {
     Inventory as InventoryIcon,
     SmartToy as SmartToyIcon,
     Assessment as AssessmentIcon,
+    Person as PersonIcon,
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 
@@ -97,6 +98,7 @@ const sidebarSections = [
     {
         header: 'Settings',
         items: [
+            { text: 'Profile', icon: <PersonIcon />, path: 'profile', tooltip: 'Manage your profile', external: true },
             { text: 'System Settings', icon: <SettingsIcon />, path: 'settings', tooltip: 'System configuration' },
         ],
     },
@@ -110,11 +112,23 @@ const Sidebar = ({ open, onClose = () => {}, variant = 'permanent' }) => {
     const isPremium = userRole === 'admin' || userRole === 'premium';
 
     const isActive = (path) => {
+        if (path === 'profile') {
+            return location.pathname === '/profile';
+        }
         return location.pathname === `/dashboard${path ? `/${path}` : ''}`;
     };
 
     const handleNavigation = (path) => {
+        if (path === 'profile') {
+            navigate('/profile');
+        } else {
         navigate(`/dashboard${path ? `/${path}` : ''}`);
+        }
+        onClose();
+    };
+
+    const handleProfileClick = () => {
+        navigate('/profile');
         onClose();
     };
 
@@ -208,7 +222,20 @@ const Sidebar = ({ open, onClose = () => {}, variant = 'permanent' }) => {
                 </Box>
             </Box>
             {/* User Profile Section */}
-            <Box sx={{ p: 2, pt: 1.5, borderTop: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }}>
+            <Box 
+                sx={{ 
+                    p: 2, 
+                    pt: 1.5, 
+                    borderTop: '1px solid rgba(255,255,255,0.08)', 
+                    flexShrink: 0,
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                    '&:hover': {
+                        background: 'rgba(255,255,255,0.05)',
+                    }
+                }}
+                onClick={handleProfileClick}
+            >
                 <Stack direction="row" alignItems="center" spacing={1.5}>
                     <Avatar sx={{ bgcolor: 'secondary.main', width: 36, height: 36 }}>
                         <AccountCircleIcon fontSize="medium" />

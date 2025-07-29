@@ -104,115 +104,115 @@ export default function Login() {
                     <CircularProgress size={60} color="primary" />
                 </Box>
             )}
-            <Container component="main" maxWidth="sm" sx={{
-                height: 'fit-content',
-                minHeight: 'auto'
-            }}>
-                <CssBaseline />
-                <Box
+        <Container component="main" maxWidth="sm" sx={{
+            height: 'fit-content',
+            minHeight: 'auto'
+        }}>
+            <CssBaseline />
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'background.paper',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    p: 4,
+                    width: '100%',
+                    maxWidth: 600,
+                }}
+            >
+                <Avatar
                     sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'background.paper',
-                        borderRadius: 2,
+                        m: 1,
+                        bgcolor: 'primary.main',
+                        width: 64,
+                        height: 64,
                         boxShadow: 3,
-                        p: 4,
-                        width: '100%',
-                        maxWidth: 600,
                     }}
                 >
-                    <Avatar
-                        sx={{
-                            m: 1,
-                            bgcolor: 'primary.main',
-                            width: 64,
-                            height: 64,
-                            boxShadow: 3,
-                        }}
-                    >
-                        <LockOutlined />
-                    </Avatar>
-                    <Typography
-                        component="h1"
-                        variant="h5"
-                        sx={{
-                            mt: 2,
-                            mb: 1,
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            color: 'primary.main',
-                        }}
-                    >
-                        Sign in
-                    </Typography>
-                    <Typography
-                        variant="subtitle1"
-                        sx={{
-                            mb: 3,
-                            textAlign: 'center',
-                            color: 'text.secondary',
-                        }}
-                    >
-                        Welcome back! Please enter your credentials
-                    </Typography>
-                    {error && (
-                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-                            {error}
-                        </Alert>
-                    )}
-                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="email"
-                            label="Email Address"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            sx={{ mb: 2 }}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            sx={{ mb: 2 }}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
+                    <LockOutlined />
+                </Avatar>
+                <Typography
+                    component="h1"
+                    variant="h5"
+                    sx={{
+                        mt: 2,
+                        mb: 1,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        color: 'primary.main',
+                    }}
+                >
+                    Sign in
+                </Typography>
+                <Typography
+                    variant="subtitle1"
+                    sx={{
+                        mb: 3,
+                        textAlign: 'center',
+                        color: 'text.secondary',
+                    }}
+                >
+                    Welcome back! Please enter your credentials
+                </Typography>
+                {error && (
+                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="email"
+                        label="Email Address"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        sx={{ mb: 2 }}
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
                             sx={{ mt: 3, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            disabled={loading}
-                        >
+                        disabled={loading}
+                    >
                             {loading && <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />}
                             Sign In
-                        </Button>
-                        <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-                            Don't have an account?{' '}
-                            <Link component={RouterLink} to="/register" sx={{
-                                color: 'primary.main',
-                                textDecoration: 'none',
-                                fontWeight: 'medium',
-                                '&:hover': {
-                                    textDecoration: 'underline',
-                                    color: 'primary.dark'
-                                }
-                            }}>
-                                Register
-                            </Link>
-                        </Typography>
-                    </Box>
+                    </Button>
+                    <Typography variant="body2" align="center" sx={{ mt: 2 }}>
+                        Don't have an account?{' '}
+                        <Link component={RouterLink} to="/register" sx={{
+                            color: 'primary.main',
+                            textDecoration: 'none',
+                            fontWeight: 'medium',
+                            '&:hover': {
+                                textDecoration: 'underline',
+                                color: 'primary.dark'
+                            }
+                        }}>
+                            Register
+                        </Link>
+                    </Typography>
                 </Box>
-            </Container>
+            </Box>
+        </Container>
         </>
     );
 }
