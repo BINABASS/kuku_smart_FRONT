@@ -29,16 +29,77 @@ export default function Register() {
         });
     };
 
+    // Validate form data
+    const validateForm = () => {
+        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.role) {
+            setError('Please fill in all required fields');
+            return false;
+        }
+        
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return false;
+        }
+        
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters long');
+            return false;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+        
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
         try {
             setLoading(true);
-            const result = await dispatch(register(formData));
-            if (result.payload) {
+            setError('');
+            
+            // Split full name into first and last name
+            const nameParts = formData.fullName.trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            // Prepare data for backend
+            const registrationData = {
+                email: formData.email,
+                password: formData.password,
+                username: formData.email, // Use email as username
+                role: formData.role,
+                first_name: firstName,
+                last_name: lastName,
+                // Additional fields for future use
+                farm_name: formData.farmName,
+                position: formData.position,
+                department: formData.department
+            };
+            
+            console.log('Sending registration data:', registrationData);
+            
+            const result = await dispatch(register(registrationData));
+            
+            if (register.fulfilled.match(result)) {
+                console.log('Registration successful');
                 navigate('/login');
+            } else if (register.rejected.match(result)) {
+                console.log('Registration failed:', result.payload);
+                setError(result.payload || 'Registration failed');
             }
         } catch (err) {
-            setError(err.message);
+            console.error('Registration error:', err);
+            setError(err.message || 'Registration failed');
         } finally {
             setLoading(false);
         }

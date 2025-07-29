@@ -17,8 +17,10 @@ import Welcome from './pages/Welcome';
 import Payments from './pages/Payments';
 import TestIntegration from './components/TestIntegration';
 
-// Debug script
-import './utils/debugApi';
+// Debug script - only load in development
+if (process.env.NODE_ENV === 'development') {
+    import('./utils/debugApi');
+}
 
 const theme = createTheme({
     palette: {

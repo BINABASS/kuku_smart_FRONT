@@ -8,10 +8,6 @@ import {
     Avatar,
     CssBaseline,
     Alert,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     Link
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -25,8 +21,7 @@ export default function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
-        password: '',
-        role: ''
+        password: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -38,8 +33,30 @@ export default function Login() {
         });
     };
 
+    // Validate form data
+    const validateForm = () => {
+        if (!formData.email || !formData.password) {
+            setError('Please fill in all required fields');
+            return false;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+        
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
         try {
             setLoading(true);
             setError('');
@@ -148,19 +165,6 @@ export default function Login() {
                         onChange={handleChange}
                         sx={{ mb: 2 }}
                     />
-                    <FormControl margin="normal" fullWidth>
-                        <InputLabel id="role-label">Role</InputLabel>
-                        <Select
-                            labelId="role-label"
-                            value={formData.role}
-                            label="Role"
-                            onChange={handleChange}
-                            name="role"
-                        >
-                            <MenuItem value="admin">Farm Administrator</MenuItem>
-                            <MenuItem value="manager">Farm Manager</MenuItem>
-                        </Select>
-                    </FormControl>
                     <Button
                         type="submit"
                         fullWidth

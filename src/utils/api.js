@@ -29,9 +29,16 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
+      // Clear authentication data
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Use a more graceful redirect method
+      // Note: In a real app, you might want to use a custom event or context
+      // to trigger navigation from components instead of directly here
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
