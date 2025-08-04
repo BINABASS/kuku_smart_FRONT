@@ -16,7 +16,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../store/authSlice';
 import { Routes, Route } from 'react-router-dom';
 import Dashboard from '../../pages/Dashboard';
-import Farmers from '../../pages/admin/Farmers';
+import Farmers from '../../pages/Farmers';
 import BatchesPage from '../../pages/Batches';
 import BreedsPage from '../../pages/Breeds';
 import Sidebar from '../admin/Sidebar';

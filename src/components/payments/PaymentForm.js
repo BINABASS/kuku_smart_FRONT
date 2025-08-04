@@ -104,9 +104,20 @@ const PaymentForm = ({ open, onClose, payment = null, onSuccess }) => {
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="sm" 
+            fullWidth
+            disableEnforceFocus
+            disableAutoFocus
+            keepMounted={false}
+            aria-labelledby="payment-dialog-title"
+        >
             <form onSubmit={handleSubmit}>
-                <DialogTitle>{payment ? 'Edit Payment' : 'New Payment'}</DialogTitle>
+                <DialogTitle id="payment-dialog-title">
+                    {payment ? 'Edit Payment' : 'New Payment'}
+                </DialogTitle>
                 <DialogContent>
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>

@@ -1,32 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Paper, Box, Typography, CircularProgress } from '@mui/material';
+import { Paper, Box, Typography, CircularProgress, Alert } from '@mui/material';
 import UserList from '../components/users/UserList';
 import UserForm from '../components/users/UserForm';
-import { api as mockApi } from '../utils/mockApi';
+import api from '../api/client';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [editUser, setEditUser] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const usersResponse = await mockApi.get('/users');
-        const rolesResponse = await mockApi.get('/roles');
-        setUsers(usersResponse.data);
-        setRoles(rolesResponse.data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await api.get('/users/');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setError('Failed to fetch users data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEdit = (user) => {
     setEditUser(user);
@@ -35,33 +37,47 @@ const Users = () => {
 
   const handleDelete = async (userId) => {
     try {
-      // In a real app, this would make an API call to delete the user
+      await api.delete(`/users/${userId}/`);
       setUsers(users.filter((user) => user.id !== userId));
+      setSuccessMessage('User deleted successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error deleting user:', error);
+      setError('Failed to delete user');
     }
   };
 
   const handleCreate = async (newUser) => {
     try {
-      // In a real app, this would make an API call to create a new user
-      const newUserWithId = { ...newUser, id: `user${Date.now()}` };
-      setUsers([...users, newUserWithId]);
+      const response = await api.post('/users/', newUser);
+      setUsers([...users, response.data]);
+      setSuccessMessage('User created successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error creating user:', error);
+      setError('Failed to create user');
     }
   };
 
   const handleUpdate = async (updatedUser) => {
     try {
-      // In a real app, this would make an API call to update the user
+      const response = await api.put(`/users/${updatedUser.id}/`, updatedUser);
       setUsers(users.map((user) => 
-        user.id === updatedUser.id ? updatedUser : user
+        user.id === updatedUser.id ? response.data : user
       ));
       setEditOpen(false);
+      setSuccessMessage('User updated successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error updating user:', error);
+      setError('Failed to update user');
     }
+  };
+
+  const handleSuccess = () => {
+    fetchUsers();
+    setSuccessMessage('Operation completed successfully!');
+    setTimeout(() => setSuccessMessage(''), 3000);
   };
 
   if (loading) {
@@ -77,22 +93,36 @@ const Users = () => {
       <Typography variant="h4" gutterBottom>
         User Management
       </Typography>
+      
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {successMessage}
+        </Alert>
+      )}
+      
       <Paper sx={{ p: 3 }}>
         <UserList
           users={users}
-          roles={roles}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onCreate={handleCreate}
+          onSuccess={handleSuccess}
         />
       </Paper>
+      
       <UserForm
         open={editOpen}
         onClose={() => setEditOpen(false)}
         user={editUser}
-        roles={roles}
         onSubmit={handleUpdate}
         onDelete={handleDelete}
+        onSuccess={handleSuccess}
       />
     </Box>
   );

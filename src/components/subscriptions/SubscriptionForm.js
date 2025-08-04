@@ -117,8 +117,19 @@ const SubscriptionForm = ({ open, onClose, subscription = null, onSuccess }) => 
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>{subscription ? 'Edit Subscription' : 'Add New Subscription'}</DialogTitle>
+        <Dialog 
+            open={open} 
+            onClose={onClose} 
+            maxWidth="md" 
+            fullWidth
+            disableEnforceFocus
+            disableAutoFocus
+            keepMounted={false}
+            aria-labelledby="subscription-dialog-title"
+        >
+            <DialogTitle id="subscription-dialog-title">
+                {subscription ? 'Edit Subscription' : 'Add New Subscription'}
+            </DialogTitle>
             <form onSubmit={handleSubmit}>
                 <DialogContent>
                     {error && (
