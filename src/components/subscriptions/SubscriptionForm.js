@@ -10,85 +10,109 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
+    Alert,
+    CircularProgress
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker as MuiDatePicker } from '@mui/x-date-pickers/DatePicker';
-import axios from 'axios';
+import api from '../../api/client';
 
-const SubscriptionForm = ({ open, onClose, subscription = null }) => {
+const SubscriptionForm = ({ open, onClose, subscription = null, onSuccess }) => {
     const [formData, setFormData] = useState({
-        farmerID: '',
-        plan_name: '',
-        start_date: null,
-        end_date: null,
-        status: 'active',
+        user: '',
+        farm: '',
+        plan: '',
+        status: 'pending',
+        auto_renew: true,
+        manager_name: ''
     });
-    const [farmers, setFarmers] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [farms, setFarms] = useState([]);
     const [plans, setPlans] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        fetchFarmersAndPlans();
-    }, []);
+        if (open) {
+            fetchData();
+        }
+    }, [open]);
 
     useEffect(() => {
         if (subscription) {
             setFormData({
-                farmerID: subscription.farmerID,
-                plan_name: subscription.plan_name,
-                start_date: new Date(subscription.start_date),
-                end_date: new Date(subscription.end_date),
-                status: subscription.status,
+                user: subscription.user || '',
+                farm: subscription.farm || '',
+                plan: subscription.plan || '',
+                status: subscription.status || 'pending',
+                auto_renew: subscription.auto_renew !== undefined ? subscription.auto_renew : true,
+                manager_name: subscription.manager_name || ''
+            });
+        } else {
+            setFormData({
+                user: '',
+                farm: '',
+                plan: '',
+                status: 'pending',
+                auto_renew: true,
+                manager_name: ''
             });
         }
     }, [subscription]);
 
-    const fetchFarmersAndPlans = async () => {
+    const fetchData = async () => {
         try {
-            const [farmersRes, plansRes] = await Promise.all([
-                axios.get('http://localhost:8000/api/farmers/'),
-                axios.get('http://localhost:8000/api/subscription-plans/'),
+            setLoading(true);
+            const [usersRes, farmsRes, plansRes] = await Promise.all([
+                api.get('/users/'),
+                api.get('/farms/'),
+                api.get('/subscription-plans/'),
             ]);
-            setFarmers(farmersRes.data);
+            setUsers(usersRes.data);
+            setFarms(farmsRes.data);
             setPlans(plansRes.data);
         } catch (error) {
             console.error('Error fetching data:', error);
+            setError('Failed to load form data. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleDateChange = (type, date) => {
-        setFormData({
-            ...formData,
-            [type]: date,
+            [name]: type === 'checkbox' ? checked : value,
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+
         try {
             const data = {
                 ...formData,
-                start_date: formData.start_date.toISOString().split('T')[0],
-                end_date: formData.end_date.toISOString().split('T')[0],
+                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
             };
 
             if (subscription) {
-                await axios.put(`http://localhost:8000/api/subscriptions/${subscription.subscriptionID}/`, data);
+                await api.put(`/subscriptions/${subscription.id}/`, data);
             } else {
-                await axios.post('http://localhost:8000/api/subscriptions/', data);
+                await api.post('/subscriptions/', data);
             }
+            
+            onSuccess && onSuccess();
             onClose();
         } catch (error) {
             console.error('Error submitting subscription:', error);
+            setError(error.response?.data?.message || 'Failed to save subscription. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -97,67 +121,116 @@ const SubscriptionForm = ({ open, onClose, subscription = null }) => {
             <DialogTitle>{subscription ? 'Edit Subscription' : 'Add New Subscription'}</DialogTitle>
             <form onSubmit={handleSubmit}>
                 <DialogContent>
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <FormControl fullWidth>
-                            <InputLabel>Farmer</InputLabel>
-                            <Select
-                                name="farmerID"
-                                value={formData.farmerID}
-                                onChange={handleChange}
-                            >
-                                {farmers.map((farmer) => (
-                                    <MenuItem key={farmer.farmerID} value={farmer.farmerID}>
-                                        {farmer.first_name} {farmer.last_name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth>
-                            <InputLabel>Plan</InputLabel>
-                            <Select
-                                name="plan_name"
-                                value={formData.plan_name}
-                                onChange={handleChange}
-                            >
-                                {plans.map((plan) => (
-                                    <MenuItem key={plan.planID} value={plan.plan_name}>
-                                        {plan.plan_name} - {plan.description}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <MuiDatePicker
-                                label="Start Date"
-                                value={formData.start_date}
-                                onChange={(date) => handleDateChange('start_date', date)}
-                                renderInput={(params) => <TextField {...params} fullWidth required />}
-                            />
-                            <MuiDatePicker
-                                label="End Date"
-                                value={formData.end_date}
-                                onChange={(date) => handleDateChange('end_date', date)}
-                                renderInput={(params) => <TextField {...params} fullWidth required />}
-                            />
-                        </LocalizationProvider>
-                        <FormControl fullWidth>
-                            <InputLabel>Status</InputLabel>
-                            <Select
-                                name="status"
-                                value={formData.status}
-                                onChange={handleChange}
-                            >
-                                <MenuItem value="active">Active</MenuItem>
-                                <MenuItem value="expired">Expired</MenuItem>
-                                <MenuItem value="cancelled">Cancelled</MenuItem>
-                            </Select>
-                        </FormControl>
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                                <CircularProgress />
+                            </Box>
+                        ) : (
+                            <>
+                                <FormControl fullWidth>
+                                    <InputLabel>User</InputLabel>
+                                    <Select
+                                        name="user"
+                                        value={formData.user}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        {users.map((user) => (
+                                            <MenuItem key={user.id} value={user.id}>
+                                                {user.email} - {user.first_name} {user.last_name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl fullWidth>
+                                    <InputLabel>Farm (Optional)</InputLabel>
+                                    <Select
+                                        name="farm"
+                                        value={formData.farm}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value="">
+                                            <em>No farm selected</em>
+                                        </MenuItem>
+                                        {farms.map((farm) => (
+                                            <MenuItem key={farm.id} value={farm.id}>
+                                                {farm.name} - {farm.location}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl fullWidth>
+                                    <InputLabel>Plan</InputLabel>
+                                    <Select
+                                        name="plan"
+                                        value={formData.plan}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        {plans.map((plan) => (
+                                            <MenuItem key={plan.id} value={plan.id}>
+                                                {plan.name} - ${plan.price} ({plan.duration_days} days)
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+
+                                <FormControl fullWidth>
+                                    <InputLabel>Status</InputLabel>
+                                    <Select
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <MenuItem value="pending">Pending</MenuItem>
+                                        <MenuItem value="active">Active</MenuItem>
+                                        <MenuItem value="expired">Expired</MenuItem>
+                                        <MenuItem value="cancelled">Cancelled</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <TextField
+                                    label="Manager Name (Optional)"
+                                    name="manager_name"
+                                    value={formData.manager_name}
+                                    onChange={handleChange}
+                                    fullWidth
+                                />
+
+                                <FormControl fullWidth>
+                                    <InputLabel>Auto Renew</InputLabel>
+                                    <Select
+                                        name="auto_renew"
+                                        value={formData.auto_renew}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value={true}>Yes</MenuItem>
+                                        <MenuItem value={false}>No</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button type="submit" variant="contained">
-                        {subscription ? 'Update' : 'Create'}
+                    <Button onClick={onClose} disabled={loading}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={20} /> : (subscription ? 'Update' : 'Create')}
                     </Button>
                 </DialogActions>
             </form>

@@ -12,17 +12,24 @@ import {
   DialogTitle, 
   DialogContent, 
   DialogActions, 
-  Button 
+  Button,
+  Chip,
+  Alert,
+  CircularProgress,
+  Box
 } from '@mui/material';
 import { 
   Edit as EditIcon,
   DeleteOutline as DeleteOutlineIcon 
 } from '@mui/icons-material';
-import api from '../../utils/api';
+import api from '../../api/client';
 
-const SubscriptionList = ({ onEdit }) => {
+const SubscriptionList = ({ onEdit, onSuccess }) => {
     const [subscriptions, setSubscriptions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(null);
 
     useEffect(() => {
         fetchSubscriptions();
@@ -30,17 +37,17 @@ const SubscriptionList = ({ onEdit }) => {
 
     const fetchSubscriptions = async () => {
         try {
-            const response = await api.get('/subscriptions');
+            setLoading(true);
+            setError('');
+            const response = await api.get('/subscriptions/');
             setSubscriptions(response.data);
-            setLoading(false);
         } catch (error) {
             console.error('Error fetching subscriptions:', error);
+            setError('Failed to load subscriptions. Please try again.');
+        } finally {
             setLoading(false);
         }
     };
-
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [selectedSubscriptionId, setSelectedSubscriptionId] = useState(null);
 
     const handleDeleteClick = (id) => {
         setSelectedSubscriptionId(id);
@@ -49,11 +56,13 @@ const SubscriptionList = ({ onEdit }) => {
 
     const handleDeleteConfirm = async () => {
         try {
-            await api.delete(`/subscriptions/${selectedSubscriptionId}`);
+            await api.delete(`/subscriptions/${selectedSubscriptionId}/`);
             setDeleteDialogOpen(false);
             fetchSubscriptions();
+            onSuccess && onSuccess();
         } catch (error) {
             console.error('Error deleting subscription:', error);
+            setError('Failed to delete subscription. Please try again.');
         }
     };
 
@@ -62,44 +71,93 @@ const SubscriptionList = ({ onEdit }) => {
         setSelectedSubscriptionId(null);
     };
 
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'active': return 'success';
+            case 'pending': return 'warning';
+            case 'expired': return 'error';
+            case 'cancelled': return 'default';
+            default: return 'default';
+        }
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString();
+    };
+
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
-        <>
+        <Box>
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                                                            <TableCell>Manager</TableCell>
+                            <TableCell>User</TableCell>
                             <TableCell>Plan</TableCell>
+                            <TableCell>Farm</TableCell>
                             <TableCell>Start Date</TableCell>
                             <TableCell>End Date</TableCell>
                             <TableCell>Status</TableCell>
+                            <TableCell>Auto Renew</TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {subscriptions.map((subscription) => (
                             <TableRow key={subscription.id}>
-                                <TableCell>{subscription.managerName}</TableCell>
-                                <TableCell>{subscription.plan}</TableCell>
-                                <TableCell>{subscription.startDate}</TableCell>
-                                <TableCell>{subscription.endDate}</TableCell>
                                 <TableCell>
-                                    <span 
-                                        style={{ 
-                                            padding: '4px 8px',
-                                            borderRadius: '4px',
-                                            fontSize: '0.875rem',
-                                            fontWeight: 500,
-                                            color: subscription.status === 'active' ? '#1976d2' : '#b00020',
-                                            backgroundColor: subscription.status === 'active' ? '#e3f2fd' : '#ffebee'
-                                        }}
-                                    >
-                                        {subscription.status}
-                                    </span>
+                                    <Box>
+                                        <div><strong>{subscription.user_email}</strong></div>
+                                        {subscription.manager_name && (
+                                            <div style={{ fontSize: '0.875rem', color: '#666' }}>
+                                                {subscription.manager_name}
+                                            </div>
+                                        )}
+                                    </Box>
+                                </TableCell>
+                                <TableCell>
+                                    <Chip 
+                                        label={subscription.plan_name} 
+                                        color="primary" 
+                                        size="small"
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    {subscription.farm_name || 'No farm assigned'}
+                                </TableCell>
+                                <TableCell>
+                                    {formatDate(subscription.start_date)}
+                                </TableCell>
+                                <TableCell>
+                                    {formatDate(subscription.end_date)}
+                                </TableCell>
+                                <TableCell>
+                                    <Chip 
+                                        label={subscription.status} 
+                                        color={getStatusColor(subscription.status)}
+                                        size="small"
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Chip 
+                                        label={subscription.auto_renew ? 'Yes' : 'No'} 
+                                        color={subscription.auto_renew ? 'success' : 'default'}
+                                        size="small"
+                                        variant="outlined"
+                                    />
                                 </TableCell>
                                 <TableCell>
                                     <IconButton 
@@ -128,7 +186,7 @@ const SubscriptionList = ({ onEdit }) => {
             >
                 <DialogTitle>Delete Subscription</DialogTitle>
                 <DialogContent>
-                    Are you sure you want to delete this subscription?
+                    Are you sure you want to delete this subscription? This action cannot be undone.
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDeleteCancel} color="primary">
@@ -139,7 +197,7 @@ const SubscriptionList = ({ onEdit }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Box>
     );
 };
 

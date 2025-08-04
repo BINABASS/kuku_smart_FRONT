@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { addNotification } from '../components/Notification';
+// Note: addNotification is now handled through the NotificationProvider context
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -15,7 +15,7 @@ api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Token ${token}`;
         }
         return config;
     },
@@ -41,23 +41,23 @@ api.interceptors.response.use(
                     break;
                 case 403:
                     // Forbidden - show error message
-                    addNotification('Access denied', 'error');
+                    console.error('Access denied');
                     break;
                 case 404:
                     // Not found - show error message
-                    addNotification('Resource not found', 'error');
+                    console.error('Resource not found');
                     break;
                 case 500:
                     // Server error - show error message
-                    addNotification('Server error', 'error');
+                    console.error('Server error');
                     break;
                 default:
                     // Other errors - show error message
-                    addNotification(data?.detail || 'An error occurred', 'error');
+                    console.error(data?.detail || 'An error occurred');
             }
         } else if (error.message === 'Network Error') {
             // Network error - show error message
-            addNotification('Network error. Please check your connection.', 'error');
+            console.error('Network error. Please check your connection.');
         }
 
         return Promise.reject(error);

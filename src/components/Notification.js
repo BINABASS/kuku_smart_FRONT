@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import {
     Snackbar,
     Alert,
@@ -8,12 +8,25 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 
-const Notification = ({ message, severity = 'info', autoHideDuration = 6000 }) => {
+// Create context for notifications
+const NotificationContext = createContext();
+
+// Custom hook to use notifications
+export const useNotification = () => {
+    const context = useContext(NotificationContext);
+    if (!context) {
+        throw new Error('useNotification must be used within a NotificationProvider');
+    }
+    return context;
+};
+
+const Notification = ({ message, severity = 'info', autoHideDuration = 6000, onClose }) => {
     const [open, setOpen] = useState(true);
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') return;
         setOpen(false);
+        onClose && onClose();
     };
 
     return (
@@ -58,31 +71,44 @@ const NotificationProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (notifications.length > 0) {
+        if (notifications.length > 0) {
+            const timer = setTimeout(() => {
                 removeNotification(notifications[0].id);
-            }
-        }, notifications[0]?.duration || 6000);
+            }, notifications[0]?.duration || 6000);
 
-        return () => clearTimeout(timer);
+            return () => clearTimeout(timer);
+        }
     }, [notifications]);
 
+    const contextValue = {
+        addNotification,
+        removeNotification,
+    };
+
     return (
-        <Box>
-            {children}
-            <Stack spacing={2} sx={{ position: 'fixed', top: 80, right: 20, zIndex: 1000 }}>
-                {notifications.map(notification => (
-                    <Notification
-                        key={notification.id}
-                        message={notification.message}
-                        severity={notification.severity}
-                        autoHideDuration={notification.duration}
-                        onClose={() => removeNotification(notification.id)}
-                    />
-                ))}
-            </Stack>
-        </Box>
+        <NotificationContext.Provider value={contextValue}>
+            <Box>
+                {children}
+                <Stack spacing={2} sx={{ position: 'fixed', top: 80, right: 20, zIndex: 1000 }}>
+                    {notifications.map(notification => (
+                        <Notification
+                            key={notification.id}
+                            message={notification.message}
+                            severity={notification.severity}
+                            autoHideDuration={notification.duration}
+                            onClose={() => removeNotification(notification.id)}
+                        />
+                    ))}
+                </Stack>
+            </Box>
+        </NotificationContext.Provider>
     );
 };
 
-export { Notification, NotificationProvider, addNotification };
+// Legacy function for backward compatibility
+export const addNotification = (message, severity = 'info', duration = 6000) => {
+    console.warn('addNotification is deprecated. Use useNotification hook instead.');
+    // This will be handled by the context when the provider is available
+};
+
+export { Notification, NotificationProvider };

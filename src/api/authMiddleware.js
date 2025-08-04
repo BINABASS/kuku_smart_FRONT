@@ -1,4 +1,4 @@
-import { addNotification } from '../components/Notification';
+// Note: addNotification is now handled through the NotificationProvider context
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent) => {
 
         // Check if token exists and is valid
         if (!token) {
-            addNotification('Please login to continue', 'warning');
+            console.warn('Please login to continue');
             navigate('/login');
             return null;
         }
@@ -24,13 +24,13 @@ const withAuth = (WrappedComponent) => {
 
             if (currentTime > expirationTime) {
                 dispatch(logout());
-                addNotification('Session expired. Please login again.', 'warning');
+                console.warn('Session expired. Please login again.');
                 navigate('/login');
                 return null;
             }
         } catch (error) {
             dispatch(logout());
-            addNotification('Invalid token. Please login again.', 'error');
+            console.error('Invalid token. Please login again.');
             navigate('/login');
             return null;
         }

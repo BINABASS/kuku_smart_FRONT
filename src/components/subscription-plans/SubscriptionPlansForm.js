@@ -16,44 +16,75 @@ import {
     MenuItem,
     Chip,
     IconButton,
+    Alert,
+    CircularProgress
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import axios from 'axios';
+import api from '../../api/client';
 
-const SubscriptionPlansForm = ({ open, onClose, plan = null }) => {
+const SubscriptionPlansForm = ({ open, onClose, plan = null, onSuccess }) => {
     const [formData, setFormData] = useState({
-        plan_name: '',
+        name: '',
+        type: 'basic',
         description: '',
         price: '',
-        duration: 1,
+        duration_days: 30,
+        max_devices: 10,
+        max_sensors: 50,
+        max_batches: 5,
         features: [],
+        is_active: true
     });
+    const [newFeature, setNewFeature] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (plan) {
             setFormData({
-                plan_name: plan.plan_name,
-                description: plan.description,
-                price: plan.price,
-                duration: plan.duration,
-                features: plan.features?.split(',') || [],
+                name: plan.name || '',
+                type: plan.type || 'basic',
+                description: plan.description || '',
+                price: plan.price || '',
+                duration_days: plan.duration_days || 30,
+                max_devices: plan.max_devices || 10,
+                max_sensors: plan.max_sensors || 50,
+                max_batches: plan.max_batches || 5,
+                features: plan.features ? Object.values(plan.features) : [],
+                is_active: plan.is_active !== undefined ? plan.is_active : true
+            });
+        } else {
+            setFormData({
+                name: '',
+                type: 'basic',
+                description: '',
+                price: '',
+                duration_days: 30,
+                max_devices: 10,
+                max_sensors: 50,
+                max_batches: 5,
+                features: [],
+                is_active: true
             });
         }
     }, [plan]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: value,
+            [name]: type === 'checkbox' ? checked : value,
         });
     };
 
-    const handleFeatureAdd = (feature) => {
-        setFormData({
-            ...formData,
-            features: [...formData.features, feature],
-        });
+    const handleFeatureAdd = () => {
+        if (newFeature.trim()) {
+            setFormData({
+                ...formData,
+                features: [...formData.features, newFeature.trim()]
+            });
+            setNewFeature('');
+        }
     };
 
     const handleFeatureDelete = (featureToDelete) => {
@@ -65,20 +96,36 @@ const SubscriptionPlansForm = ({ open, onClose, plan = null }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+
         try {
             const data = {
                 ...formData,
-                features: formData.features.join(','),
+                price: parseFloat(formData.price),
+                duration_days: parseInt(formData.duration_days),
+                max_devices: parseInt(formData.max_devices),
+                max_sensors: parseInt(formData.max_sensors),
+                max_batches: parseInt(formData.max_batches),
+                features: formData.features.reduce((acc, feature, index) => {
+                    acc[`feature_${index}`] = feature;
+                    return acc;
+                }, {})
             };
 
             if (plan) {
-                await axios.put(`http://localhost:8000/api/subscription-plans/${plan.planID}/`, data);
+                await api.put(`/subscription-plans/${plan.id}/`, data);
             } else {
-                await axios.post('http://localhost:8000/api/subscription-plans/', data);
+                await api.post('/subscription-plans/', data);
             }
+            
+            onSuccess && onSuccess();
             onClose();
         } catch (error) {
             console.error('Error submitting subscription plan:', error);
+            setError(error.response?.data?.message || 'Failed to save subscription plan. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -87,75 +134,160 @@ const SubscriptionPlansForm = ({ open, onClose, plan = null }) => {
             <DialogTitle>{plan ? 'Edit Plan' : 'Add New Plan'}</DialogTitle>
             <form onSubmit={handleSubmit}>
                 <DialogContent>
+                    {error && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <TextField
-                            label="Plan Name"
-                            name="plan_name"
-                            value={formData.plan_name}
-                            onChange={handleChange}
-                            fullWidth
-                            required
-                        />
-                        <TextField
-                            label="Description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            fullWidth
-                            multiline
-                            rows={3}
-                        />
-                        <TextField
-                            label="Price ($)"
-                            name="price"
-                            value={formData.price}
-                            onChange={handleChange}
-                            type="number"
-                            fullWidth
-                            required
-                        />
-                        <FormControl fullWidth>
-                            <InputLabel>Duration (months)</InputLabel>
-                            <Select
-                                name="duration"
-                                value={formData.duration}
-                                onChange={handleChange}
-                            >
-                                {[1, 3, 6, 12, 24].map((months) => (
-                                    <MenuItem key={months} value={months}>
-                                        {months} months
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            <TextField
-                                label="Add Feature"
-                                fullWidth
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter' && e.target.value.trim()) {
-                                        handleFeatureAdd(e.target.value.trim());
-                                        e.target.value = '';
-                                    }
-                                }}
-                            />
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                {formData.features.map((feature) => (
-                                    <Chip
-                                        key={feature}
-                                        label={feature}
-                                        onDelete={() => handleFeatureDelete(feature)}
-                                        size="small"
-                                    />
-                                ))}
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                                <CircularProgress />
                             </Box>
-                        </Box>
+                        ) : (
+                            <>
+                                <TextField
+                                    label="Plan Name"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    required
+                                />
+                                
+                                <FormControl fullWidth>
+                                    <InputLabel>Plan Type</InputLabel>
+                                    <Select
+                                        name="type"
+                                        value={formData.type}
+                                        onChange={handleChange}
+                                        required
+                                    >
+                                        <MenuItem value="basic">Basic</MenuItem>
+                                        <MenuItem value="premium">Premium</MenuItem>
+                                        <MenuItem value="enterprise">Enterprise</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <TextField
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    multiline
+                                    rows={3}
+                                />
+
+                                <TextField
+                                    label="Price"
+                                    name="price"
+                                    type="number"
+                                    value={formData.price}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    required
+                                    inputProps={{ min: 0, step: 0.01 }}
+                                />
+
+                                <TextField
+                                    label="Duration (Days)"
+                                    name="duration_days"
+                                    type="number"
+                                    value={formData.duration_days}
+                                    onChange={handleChange}
+                                    fullWidth
+                                    required
+                                    inputProps={{ min: 1 }}
+                                />
+
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <TextField
+                                        label="Max Devices"
+                                        name="max_devices"
+                                        type="number"
+                                        value={formData.max_devices}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 1 }}
+                                    />
+                                    <TextField
+                                        label="Max Sensors"
+                                        name="max_sensors"
+                                        type="number"
+                                        value={formData.max_sensors}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 1 }}
+                                    />
+                                    <TextField
+                                        label="Max Batches"
+                                        name="max_batches"
+                                        type="number"
+                                        value={formData.max_batches}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 1 }}
+                                    />
+                                </Box>
+
+                                <FormControl fullWidth>
+                                    <InputLabel>Status</InputLabel>
+                                    <Select
+                                        name="is_active"
+                                        value={formData.is_active}
+                                        onChange={handleChange}
+                                    >
+                                        <MenuItem value={true}>Active</MenuItem>
+                                        <MenuItem value={false}>Inactive</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <Box>
+                                    <Typography variant="h6" gutterBottom>
+                                        Features
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                        <TextField
+                                            label="Add Feature"
+                                            value={newFeature}
+                                            onChange={(e) => setNewFeature(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleFeatureAdd())}
+                                            fullWidth
+                                        />
+                                        <IconButton onClick={handleFeatureAdd} color="primary">
+                                            <AddIcon />
+                                        </IconButton>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                        {formData.features.map((feature, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={feature}
+                                                onDelete={() => handleFeatureDelete(feature)}
+                                                color="primary"
+                                                variant="outlined"
+                                            />
+                                        ))}
+                                    </Box>
+                                </Box>
+                            </>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button type="submit" variant="contained">
-                        {plan ? 'Update' : 'Create'}
+                    <Button onClick={onClose} disabled={loading}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={20} /> : (plan ? 'Update' : 'Create')}
                     </Button>
                 </DialogActions>
             </form>
