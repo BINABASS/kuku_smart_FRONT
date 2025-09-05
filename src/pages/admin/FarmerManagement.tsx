@@ -204,9 +204,26 @@ const FarmerManagement = () => {
     setIsSubmitting(true);
 
     try {
+      // Build payload: coerce numbers, remove empty strings
+      // Find the selected user to enrich payload if backend requires denormalized fields
+      const selectedUserRecord = users.find((u: any) => u.id === Number(formData.user));
+      const payload: any = {
+        ...formData,
+        user: Number(formData.user) || undefined,
+        experience_years: Number(formData.experience_years) || 0,
+        farm_size: Number(formData.farm_size) || 0,
+        // Backend expects these fields in some endpoints
+        full_name: selectedUserRecord ? `${selectedUserRecord.first_name || ''} ${selectedUserRecord.last_name || ''}`.trim() : undefined,
+        email: selectedUserRecord?.email || undefined,
+        phone: formData.phone_number || undefined,
+      };
+      Object.keys(payload).forEach((k) => {
+        if (payload[k] === '') payload[k] = null;
+      });
+
       if (selectedFarmer) {
         // Update existing farmer
-        await api.put(`farmers/${selectedFarmer.id}/`, formData);
+        await api.put(`farmers/${selectedFarmer.id}/`, payload);
         toast({
           title: 'Success',
           description: 'Farmer updated successfully',
@@ -216,7 +233,7 @@ const FarmerManagement = () => {
         });
       } else {
         // Create new farmer
-        await api.post('farmers/', formData);
+        await api.post('farmers/', payload);
         toast({
           title: 'Success',
           description: 'Farmer created successfully',
@@ -231,7 +248,18 @@ const FarmerManagement = () => {
       fetchFarmers();
     } catch (err: any) {
       console.error('Error saving farmer:', err);
-      const errorMessage = err.response?.data?.detail || 'Failed to save farmer';
+      let errorMessage = 'Failed to save farmer';
+      if (err?.response?.data) {
+        const data = err.response.data;
+        if (typeof data === 'string') errorMessage = data;
+        else if (data.detail) errorMessage = data.detail;
+        else {
+          // Join field errors
+          errorMessage = Object.entries(data)
+            .map(([field, msgs]) => `${field}: ${(Array.isArray(msgs) ? msgs.join(', ') : String(msgs))}`)
+            .join(' | ');
+        }
+      }
       toast({
         title: 'Error',
         description: errorMessage,
@@ -608,7 +636,8 @@ const FarmerManagement = () => {
             {selectedFarmer ? 'Edit Farmer' : 'Create New Farmer'}
           </ModalHeader>
           <ModalCloseButton />
-          <form onSubmit={handleSubmit}>
+          {/* Disable native HTML validation to avoid non-focusable required errors across tabs */}
+          <form onSubmit={handleSubmit} noValidate>
             <ModalBody>
               <Tabs>
                 <TabList>
@@ -675,7 +704,7 @@ const FarmerManagement = () => {
 
                   <TabPanel>
                     <VStack spacing={4}>
-                      <FormControl isRequired>
+                      <FormControl>
                         <FormLabel>Phone Number</FormLabel>
                         <ChakraInput
                           value={formData.phone_number}
@@ -684,7 +713,7 @@ const FarmerManagement = () => {
                         />
                       </FormControl>
 
-                      <FormControl isRequired>
+                      <FormControl>
                         <FormLabel>Address</FormLabel>
                         <Textarea
                           value={formData.address}
@@ -694,7 +723,7 @@ const FarmerManagement = () => {
                       </FormControl>
 
                       <HStack spacing={4} w="full">
-                        <FormControl isRequired>
+                        <FormControl>
                           <FormLabel>City</FormLabel>
                           <ChakraInput
                             value={formData.city}
@@ -703,7 +732,7 @@ const FarmerManagement = () => {
                           />
                         </FormControl>
 
-                        <FormControl isRequired>
+                        <FormControl>
                           <FormLabel>State</FormLabel>
                           <ChakraInput
                             value={formData.state}
@@ -714,7 +743,7 @@ const FarmerManagement = () => {
                       </HStack>
 
                       <HStack spacing={4} w="full">
-                        <FormControl isRequired>
+                        <FormControl>
                           <FormLabel>Country</FormLabel>
                           <ChakraInput
                             value={formData.country}

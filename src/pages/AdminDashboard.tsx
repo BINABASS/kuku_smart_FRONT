@@ -150,7 +150,7 @@ export default function AdminDashboard() {
             <CardBody>
               <Stat>
                 <StatLabel>System Health</StatLabel>
-                <StatNumber>{/* keep empty if unknown */}</StatNumber>
+                <StatNumber>{''}</StatNumber>
                 <StatHelpText>
                   <Icon as={CheckCircleIcon} color="green.500" />
                   All systems operational
