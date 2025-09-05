@@ -23,7 +23,6 @@ import {
   WarningIcon,
   CheckIcon,
   CloseIcon,
-  ExternalLinkIcon,
 } from '@chakra-ui/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -283,7 +282,7 @@ const AdminSidebar = () => {
       ],
     },
     {
-      icon: ExternalLinkIcon,
+      icon: ViewIcon,
       label: 'Django Admin',
       href: '/admin/django-admin',
     },

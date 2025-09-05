@@ -1,7 +1,7 @@
 import { Box, Heading, SimpleGrid, Stat, StatLabel, StatNumber, Text, useToast } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useEffect } from 'react';
 

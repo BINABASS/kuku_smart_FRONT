@@ -25,8 +25,7 @@ import {
   ViewIcon, 
   SettingsIcon, 
   WarningIcon,
-  CheckCircleIcon,
-  ExternalLinkIcon
+  CheckCircleIcon
 } from '@chakra-ui/icons';
 import { Link } from 'react-router-dom';
 
@@ -51,7 +50,7 @@ export default function AdminDashboard() {
     { label: 'Manage Users', href: '/admin/users', icon: ViewIcon, color: 'blue' },
     { label: 'View Subscriptions', href: '/admin/subscriptions', icon: ViewIcon, color: 'green' },
     { label: 'System Settings', href: '/admin/settings', icon: SettingsIcon, color: 'purple' },
-    { label: 'Django Admin', href: '/admin/django-admin', icon: ExternalLinkIcon, color: 'orange' },
+    { label: 'Django Admin', href: '/admin/django-admin', icon: ViewIcon, color: 'orange' },
   ];
 
   const recentActivities = [

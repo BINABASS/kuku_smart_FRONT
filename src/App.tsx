@@ -9,6 +9,11 @@ import AdminDashboard from './pages/AdminDashboard';
 import FarmerDashboard from './pages/FarmerDashboard';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home.tsx';
+import UserManagement from './pages/admin/UserManagement';
+import FarmerManagement from './pages/admin/FarmerManagement';
+import FarmManagement from './pages/admin/FarmManagement';
+import DeviceManagement from './pages/admin/DeviceManagement';
+import SubscriptionManagement from './pages/admin/SubscriptionManagement';
 
 // This component is used to wrap protected routes
 const ProtectedLayout = () => {
@@ -127,10 +132,10 @@ function App() {
             } 
           >
             <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<div>Users Management</div>} />
-            <Route path="farmers" element={<div>Farmers Management</div>} />
-            <Route path="farms" element={<div>Farms Management</div>} />
-            <Route path="devices" element={<div>Devices Management</div>} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="farmers" element={<FarmerManagement />} />
+            <Route path="farms" element={<FarmManagement />} />
+            <Route path="devices" element={<DeviceManagement />} />
             <Route path="breed-types" element={<div>Breed Types Management</div>} />
             <Route path="breeds" element={<div>Breeds Management</div>} />
             <Route path="activity-types" element={<div>Activity Types Management</div>} />
@@ -140,7 +145,7 @@ function App() {
             <Route path="batches" element={<div>Batches Management</div>} />
             <Route path="activities" element={<div>Activities Management</div>} />
             <Route path="readings" element={<div>Readings Management</div>} />
-            <Route path="subscriptions" element={<div>Subscriptions Management</div>} />
+            <Route path="subscriptions" element={<SubscriptionManagement />} />
             <Route path="subscription-types" element={<div>Subscription Types Management</div>} />
             <Route path="resources" element={<div>Resources Management</div>} />
             <Route path="payments" element={<div>Payments Management</div>} />

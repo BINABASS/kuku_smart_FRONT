@@ -1,5 +1,5 @@
 import { Box, Button, Heading, Text } from '@chakra-ui/react';
-import { RepeatIcon } from '@chakra-ui/icons';
+import { SpinnerIcon } from '@chakra-ui/icons';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <ErrorBoundary
           fallback={({ error, resetErrorBoundary }) => (
             <Box textAlign="center" py={10} px={6}>
-              <RepeatIcon boxSize={'50px'} color={'red.500'} />
+              <SpinnerIcon boxSize={'50px'} color={'red.500'} />
               <Heading as="h2" size="xl" mt={6} mb={2}>
                 Something went wrong
               </Heading>

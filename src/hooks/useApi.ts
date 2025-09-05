@@ -1,7 +1,7 @@
 import { useMutation, useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export const useApi = <T>(
