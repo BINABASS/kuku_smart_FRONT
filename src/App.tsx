@@ -14,6 +14,18 @@ import FarmerManagement from './pages/admin/FarmerManagement';
 import FarmManagement from './pages/admin/FarmManagement';
 import DeviceManagement from './pages/admin/DeviceManagement';
 import SubscriptionManagement from './pages/admin/SubscriptionManagement';
+import BreedTypesPage from './pages/admin/masterdata/BreedTypesPage';
+import BreedsPage from './pages/admin/masterdata/BreedsPage';
+import ActivityTypesPage from './pages/admin/masterdata/ActivityTypesPage';
+import ConditionTypesPage from './pages/admin/masterdata/ConditionTypesPage';
+import FoodTypesPage from './pages/admin/masterdata/FoodTypesPage';
+import SensorTypesPage from './pages/admin/masterdata/SensorTypesPage';
+import BatchesPage from './pages/admin/operations/BatchesPage';
+import ActivitiesPage from './pages/admin/operations/ActivitiesPage';
+import ReadingsPage from './pages/admin/operations/ReadingsPage';
+import SubscriptionTypesPage from './pages/admin/subscriptions/SubscriptionTypesPage';
+import ResourcesPage from './pages/admin/subscriptions/ResourcesPage';
+import PaymentsPage from './pages/admin/subscriptions/PaymentsPage';
 
 // This component is used to wrap protected routes
 const ProtectedLayout = () => {
@@ -146,19 +158,19 @@ function App() {
           <Route path="farmers" element={<FarmerManagement />} />
           <Route path="farms" element={<FarmManagement />} />
           <Route path="devices" element={<DeviceManagement />} />
-          <Route path="breed-types" element={<div>Breed Types Management</div>} />
-          <Route path="breeds" element={<div>Breeds Management</div>} />
-          <Route path="activity-types" element={<div>Activity Types Management</div>} />
-          <Route path="condition-types" element={<div>Condition Types Management</div>} />
-          <Route path="food-types" element={<div>Food Types Management</div>} />
-          <Route path="sensor-types" element={<div>Sensor Types Management</div>} />
-          <Route path="batches" element={<div>Batches Management</div>} />
-          <Route path="activities" element={<div>Activities Management</div>} />
-          <Route path="readings" element={<div>Readings Management</div>} />
+          <Route path="breed-types" element={<BreedTypesPage />} />
+          <Route path="breeds" element={<BreedsPage />} />
+          <Route path="activity-types" element={<ActivityTypesPage />} />
+          <Route path="condition-types" element={<ConditionTypesPage />} />
+          <Route path="food-types" element={<FoodTypesPage />} />
+          <Route path="sensor-types" element={<SensorTypesPage />} />
+          <Route path="batches" element={<BatchesPage />} />
+          <Route path="activities" element={<ActivitiesPage />} />
+          <Route path="readings" element={<ReadingsPage />} />
           <Route path="subscriptions" element={<SubscriptionManagement />} />
-          <Route path="subscription-types" element={<div>Subscription Types Management</div>} />
-          <Route path="resources" element={<div>Resources Management</div>} />
-          <Route path="payments" element={<div>Payments Management</div>} />
+          <Route path="subscription-types" element={<SubscriptionTypesPage />} />
+          <Route path="resources" element={<ResourcesPage />} />
+          <Route path="payments" element={<PaymentsPage />} />
           <Route path="health-conditions" element={<div>Health Conditions Management</div>} />
           <Route path="recommendations" element={<div>Recommendations Management</div>} />
           <Route path="disease-exceptions" element={<div>Disease Exceptions Management</div>} />

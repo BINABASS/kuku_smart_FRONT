@@ -141,7 +141,7 @@ const SubscriptionManagement = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await api.get('subscriptions/');
+      const response = await api.get('farmer-subscriptions/');
       setSubscriptions(response.data.results || response.data);
       setFilteredSubscriptions(response.data.results || response.data);
     } catch (err: any) {
@@ -203,7 +203,7 @@ const SubscriptionManagement = () => {
     try {
       if (selectedSubscription) {
         // Update existing subscription
-        await api.put(`subscriptions/${selectedSubscription.id}/`, formData);
+        await api.put(`farmer-subscriptions/${selectedSubscription.id}/`, formData);
         toast({
           title: 'Success',
           description: 'Subscription updated successfully',
@@ -213,7 +213,7 @@ const SubscriptionManagement = () => {
         });
       } else {
         // Create new subscription
-        await api.post('subscriptions/', formData);
+        await api.post('farmer-subscriptions/', formData);
         toast({
           title: 'Success',
           description: 'Subscription created successfully',
@@ -246,7 +246,7 @@ const SubscriptionManagement = () => {
     if (!selectedSubscription) return;
 
     try {
-      await api.delete(`subscriptions/${selectedSubscription.id}/`);
+      await api.delete(`farmer-subscriptions/${selectedSubscription.id}/`);
       toast({
         title: 'Success',
         description: 'Subscription deleted successfully',

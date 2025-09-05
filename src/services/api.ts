@@ -9,6 +9,8 @@ import type {
 
 // Use VITE_API_URL from .env file. Default includes /api/v1 for app endpoints
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+// Derive root host for auth endpoints (token/refresh is not under /api/v1)
+const API_ROOT_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
 // Extend the AxiosRequestConfig to include the _retry property
 interface CustomAxiosRequestConfig extends AxiosRequestConfig {
@@ -47,8 +49,8 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
-          // Use the base URL without /api/v1 for token refresh
-          const response = await axios.post(`${API_BASE_URL}/api/token/refresh/`, {
+          // Use the root URL (no /api/v1) for token refresh
+          const response = await axios.post(`${API_ROOT_URL}/api/token/refresh/`, {
             refresh: refreshToken
           });
           

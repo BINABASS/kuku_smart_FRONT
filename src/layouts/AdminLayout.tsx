@@ -120,8 +120,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </Box>
 
         {/* Main Content */}
-        <Box as="main" flex="1" py={8} px={4}>
-          <Box maxW="container.xl" w="100%" mx="auto">
+        <Box as="main" flex="1" py={8} px={{ base: 4, md: 6, lg: 8 }}>
+          <Box w="100%">
             {children}
           </Box>
         </Box>
