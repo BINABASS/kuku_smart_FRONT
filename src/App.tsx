@@ -2,6 +2,7 @@ import { Box, useColorModeValue } from '@chakra-ui/react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth, type UserRole } from './context/AuthContext';
 import Layout from './layouts/Layout';
+import AdminLayout from './layouts/AdminLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
@@ -15,6 +16,15 @@ const ProtectedLayout = () => {
     <Layout>
       <Outlet />
     </Layout>
+  );
+};
+
+// This component is used to wrap admin routes
+const AdminProtectedLayout = () => {
+  return (
+    <AdminLayout>
+      <Outlet />
+    </AdminLayout>
   );
 };
 
@@ -109,13 +119,38 @@ function App() {
           />
           
           <Route 
-            path="admin" 
+            path="admin/*" 
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
+                <AdminProtectedLayout />
               </ProtectedRoute>
             } 
-          />
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="users" element={<div>Users Management</div>} />
+            <Route path="farmers" element={<div>Farmers Management</div>} />
+            <Route path="farms" element={<div>Farms Management</div>} />
+            <Route path="devices" element={<div>Devices Management</div>} />
+            <Route path="breed-types" element={<div>Breed Types Management</div>} />
+            <Route path="breeds" element={<div>Breeds Management</div>} />
+            <Route path="activity-types" element={<div>Activity Types Management</div>} />
+            <Route path="condition-types" element={<div>Condition Types Management</div>} />
+            <Route path="food-types" element={<div>Food Types Management</div>} />
+            <Route path="sensor-types" element={<div>Sensor Types Management</div>} />
+            <Route path="batches" element={<div>Batches Management</div>} />
+            <Route path="activities" element={<div>Activities Management</div>} />
+            <Route path="readings" element={<div>Readings Management</div>} />
+            <Route path="subscriptions" element={<div>Subscriptions Management</div>} />
+            <Route path="subscription-types" element={<div>Subscription Types Management</div>} />
+            <Route path="resources" element={<div>Resources Management</div>} />
+            <Route path="payments" element={<div>Payments Management</div>} />
+            <Route path="health-conditions" element={<div>Health Conditions Management</div>} />
+            <Route path="recommendations" element={<div>Recommendations Management</div>} />
+            <Route path="disease-exceptions" element={<div>Disease Exceptions Management</div>} />
+            <Route path="anomalies" element={<div>Anomalies Management</div>} />
+            <Route path="medications" element={<div>Medications Management</div>} />
+            <Route path="django-admin" element={<div>Django Admin</div>} />
+          </Route>
           
           <Route 
             path="farmer" 
