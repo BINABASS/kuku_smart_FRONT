@@ -26,6 +26,11 @@ import ReadingsPage from './pages/admin/operations/ReadingsPage';
 import SubscriptionTypesPage from './pages/admin/subscriptions/SubscriptionTypesPage';
 import ResourcesPage from './pages/admin/subscriptions/ResourcesPage';
 import PaymentsPage from './pages/admin/subscriptions/PaymentsPage';
+import HealthConditionsPage from './pages/admin/knowledge/HealthConditionsPage';
+import RecommendationsPage from './pages/admin/knowledge/RecommendationsPage';
+import DiseaseExceptionsPage from './pages/admin/knowledge/DiseaseExceptionsPage';
+import AnomaliesPage from './pages/admin/knowledge/AnomaliesPage';
+import MedicationsPage from './pages/admin/knowledge/MedicationsPage';
 
 // This component is used to wrap protected routes
 const ProtectedLayout = () => {
@@ -171,11 +176,11 @@ function App() {
           <Route path="subscription-types" element={<SubscriptionTypesPage />} />
           <Route path="resources" element={<ResourcesPage />} />
           <Route path="payments" element={<PaymentsPage />} />
-          <Route path="health-conditions" element={<div>Health Conditions Management</div>} />
-          <Route path="recommendations" element={<div>Recommendations Management</div>} />
-          <Route path="disease-exceptions" element={<div>Disease Exceptions Management</div>} />
-          <Route path="anomalies" element={<div>Anomalies Management</div>} />
-          <Route path="medications" element={<div>Medications Management</div>} />
+          <Route path="health-conditions" element={<HealthConditionsPage />} />
+          <Route path="recommendations" element={<RecommendationsPage />} />
+          <Route path="disease-exceptions" element={<DiseaseExceptionsPage />} />
+          <Route path="anomalies" element={<AnomaliesPage />} />
+          <Route path="medications" element={<MedicationsPage />} />
           <Route path="django-admin" element={<div>Django Admin</div>} />
         </Route>
         
