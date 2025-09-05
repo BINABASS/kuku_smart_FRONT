@@ -28,23 +28,59 @@ import {
   CheckCircleIcon
 } from '@chakra-ui/icons';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import api from '../services/api';
 
 export default function AdminDashboard() {
   const cardBg = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const textColor = useColorModeValue('gray.600', 'gray.300');
-
-  // Mock data - replace with actual API calls
-  const stats = {
-    totalUsers: 156,
-    totalFarmers: 89,
-    activeFarms: 67,
-    totalDevices: 234,
-    activeSubscriptions: 45,
-    monthlyRevenue: 12500,
-    systemHealth: 98.5,
-    pendingTasks: 3
-  };
+  
+  // Real data (optional). If a fetch fails, keep undefined to render empty.
+  const [totalUsers, setTotalUsers] = useState<number | undefined>(undefined);
+  const [totalFarmers, setTotalFarmers] = useState<number | undefined>(undefined);
+  const [activeFarms, setActiveFarms] = useState<number | undefined>(undefined);
+  const [totalDevices, setTotalDevices] = useState<number | undefined>(undefined);
+  const [activeSubscriptions, setActiveSubscriptions] = useState<number | undefined>(undefined);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [users, farmers, farms, devices, subs] = await Promise.all([
+          api.get('users/').catch(() => ({ data: { results: [] } })),
+          api.get('farmers/').catch(() => ({ data: { results: [] } })),
+          api.get('farms/').catch(() => ({ data: { results: [] } })),
+          api.get('devices/').catch(() => ({ data: { results: [] } })),
+          api.get('farmer-subscriptions/').catch(() => ({ data: { results: [] } })),
+        ]);
+        const usersArr = users.data.results || users.data || [];
+        const farmersArr = farmers.data.results || farmers.data || [];
+        const farmsArr = farms.data.results || farms.data || [];
+        const devicesArr = devices.data.results || devices.data || [];
+        const subsArr = subs.data.results || subs.data || [];
+        setTotalUsers(Array.isArray(usersArr) ? usersArr.length : undefined);
+        setTotalFarmers(Array.isArray(farmersArr) ? farmersArr.length : undefined);
+        setActiveFarms(Array.isArray(farmsArr) ? farmsArr.length : undefined);
+        setTotalDevices(Array.isArray(devicesArr) ? devicesArr.length : undefined);
+        setActiveSubscriptions(Array.isArray(subsArr) ? subsArr.length : undefined);
+      } catch (_) {
+        // leave undefined to show blanks
+      }
+      try {
+        // Optional revenue: sum of payments if available
+        const payments = await api.get('payments/');
+        const payArr = payments.data.results || payments.data || [];
+        if (Array.isArray(payArr)) {
+          const total = payArr.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+          setMonthlyRevenue(total);
+        }
+      } catch (_) {
+        setMonthlyRevenue(undefined);
+      }
+    };
+    fetchCounts();
+  }, []);
 
   const quickActions = [
     { label: 'Manage Users', href: '/admin/users', icon: ViewIcon, color: 'blue' },
@@ -75,7 +111,7 @@ export default function AdminDashboard() {
             <CardBody>
               <Stat>
                 <StatLabel>Total Users</StatLabel>
-                <StatNumber>{stats.totalUsers}</StatNumber>
+                <StatNumber>{totalUsers ?? ''}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="increase" />
                   12% from last month
@@ -87,8 +123,8 @@ export default function AdminDashboard() {
           <Card bg={cardBg} borderColor={borderColor}>
             <CardBody>
               <Stat>
-                <StatLabel>Active Farms</StatLabel>
-                <StatNumber>{stats.activeFarms}</StatNumber>
+                <StatLabel>Farms</StatLabel>
+                <StatNumber>{activeFarms ?? ''}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="increase" />
                   8% from last month
@@ -101,7 +137,7 @@ export default function AdminDashboard() {
             <CardBody>
               <Stat>
                 <StatLabel>Monthly Revenue</StatLabel>
-                <StatNumber>${stats.monthlyRevenue.toLocaleString()}</StatNumber>
+                <StatNumber>{monthlyRevenue !== undefined ? `$${monthlyRevenue.toLocaleString()}` : ''}</StatNumber>
                 <StatHelpText>
                   <StatArrow type="increase" />
                   15% from last month
@@ -114,7 +150,7 @@ export default function AdminDashboard() {
             <CardBody>
               <Stat>
                 <StatLabel>System Health</StatLabel>
-                <StatNumber>{stats.systemHealth}%</StatNumber>
+                <StatNumber>{/* keep empty if unknown */}</StatNumber>
                 <StatHelpText>
                   <Icon as={CheckCircleIcon} color="green.500" />
                   All systems operational
@@ -189,21 +225,21 @@ export default function AdminDashboard() {
                 <Box>
                   <HStack justify="space-between">
                     <Text fontSize="sm">Total Farmers</Text>
-                    <Text fontWeight="bold">{stats.totalFarmers}</Text>
+                    <Text fontWeight="bold">{totalFarmers ?? ''}</Text>
                   </HStack>
                 </Box>
                 <Divider />
                 <Box>
                   <HStack justify="space-between">
                     <Text fontSize="sm">Active Devices</Text>
-                    <Text fontWeight="bold">{stats.totalDevices}</Text>
+                    <Text fontWeight="bold">{totalDevices ?? ''}</Text>
                   </HStack>
                 </Box>
                 <Divider />
                 <Box>
                   <HStack justify="space-between">
                     <Text fontSize="sm">Active Subscriptions</Text>
-                    <Text fontWeight="bold">{stats.activeSubscriptions}</Text>
+                    <Text fontWeight="bold">{activeSubscriptions ?? ''}</Text>
                   </HStack>
                 </Box>
                 <Divider />
@@ -211,7 +247,7 @@ export default function AdminDashboard() {
                   <HStack justify="space-between">
                     <Text fontSize="sm">Pending Tasks</Text>
                     <Badge colorScheme="orange" variant="subtle">
-                      {stats.pendingTasks}
+                      {/* left blank intentionally */}
                     </Badge>
                   </HStack>
                 </Box>
