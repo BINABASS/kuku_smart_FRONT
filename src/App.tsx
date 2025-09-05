@@ -112,7 +112,7 @@ function App() {
           <Route path="register" element={<Register />} />
         </Route>
         
-        {/* Protected routes */}
+        {/* Protected routes - App layout for generic protected pages */}
         <Route element={
           <ProtectedRoute allowedRoles={['admin', 'farmer']}>
             <ProtectedLayout />
@@ -122,41 +122,6 @@ function App() {
             path="dashboard" 
             element={<DashboardRedirect />}
           />
-          
-          <Route 
-            path="admin/*" 
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminProtectedLayout />
-              </ProtectedRoute>
-            } 
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="users" element={<UserManagement />} />
-            <Route path="farmers" element={<FarmerManagement />} />
-            <Route path="farms" element={<FarmManagement />} />
-            <Route path="devices" element={<DeviceManagement />} />
-            <Route path="breed-types" element={<div>Breed Types Management</div>} />
-            <Route path="breeds" element={<div>Breeds Management</div>} />
-            <Route path="activity-types" element={<div>Activity Types Management</div>} />
-            <Route path="condition-types" element={<div>Condition Types Management</div>} />
-            <Route path="food-types" element={<div>Food Types Management</div>} />
-            <Route path="sensor-types" element={<div>Sensor Types Management</div>} />
-            <Route path="batches" element={<div>Batches Management</div>} />
-            <Route path="activities" element={<div>Activities Management</div>} />
-            <Route path="readings" element={<div>Readings Management</div>} />
-            <Route path="subscriptions" element={<SubscriptionManagement />} />
-            <Route path="subscription-types" element={<div>Subscription Types Management</div>} />
-            <Route path="resources" element={<div>Resources Management</div>} />
-            <Route path="payments" element={<div>Payments Management</div>} />
-            <Route path="health-conditions" element={<div>Health Conditions Management</div>} />
-            <Route path="recommendations" element={<div>Recommendations Management</div>} />
-            <Route path="disease-exceptions" element={<div>Disease Exceptions Management</div>} />
-            <Route path="anomalies" element={<div>Anomalies Management</div>} />
-            <Route path="medications" element={<div>Medications Management</div>} />
-            <Route path="django-admin" element={<div>Django Admin</div>} />
-          </Route>
-          
           <Route 
             path="farmer" 
             element={
@@ -165,6 +130,41 @@ function App() {
               </ProtectedRoute>
             } 
           />
+        </Route>
+
+        {/* Admin routes - use AdminLayout only to avoid duplicate headers */}
+        <Route 
+          path="admin/*" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminProtectedLayout />
+            </ProtectedRoute>
+          } 
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="farmers" element={<FarmerManagement />} />
+          <Route path="farms" element={<FarmManagement />} />
+          <Route path="devices" element={<DeviceManagement />} />
+          <Route path="breed-types" element={<div>Breed Types Management</div>} />
+          <Route path="breeds" element={<div>Breeds Management</div>} />
+          <Route path="activity-types" element={<div>Activity Types Management</div>} />
+          <Route path="condition-types" element={<div>Condition Types Management</div>} />
+          <Route path="food-types" element={<div>Food Types Management</div>} />
+          <Route path="sensor-types" element={<div>Sensor Types Management</div>} />
+          <Route path="batches" element={<div>Batches Management</div>} />
+          <Route path="activities" element={<div>Activities Management</div>} />
+          <Route path="readings" element={<div>Readings Management</div>} />
+          <Route path="subscriptions" element={<SubscriptionManagement />} />
+          <Route path="subscription-types" element={<div>Subscription Types Management</div>} />
+          <Route path="resources" element={<div>Resources Management</div>} />
+          <Route path="payments" element={<div>Payments Management</div>} />
+          <Route path="health-conditions" element={<div>Health Conditions Management</div>} />
+          <Route path="recommendations" element={<div>Recommendations Management</div>} />
+          <Route path="disease-exceptions" element={<div>Disease Exceptions Management</div>} />
+          <Route path="anomalies" element={<div>Anomalies Management</div>} />
+          <Route path="medications" element={<div>Medications Management</div>} />
+          <Route path="django-admin" element={<div>Django Admin</div>} />
         </Route>
         
         {/* 404 route */}

@@ -284,7 +284,7 @@ const AdminSidebar = () => {
     {
       icon: ViewIcon,
       label: 'Django Admin',
-      href: '/admin/django-admin',
+      href: 'http://localhost:8000/admin/',
     },
   ];
 
